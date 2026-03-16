@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Notifikasi</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('notifikasi')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="notifPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Notifikasi Sistem</h2>
+            <p x-text="$store.notif.unread+' notifikasi belum dibaca'"></p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline" @click="markAll()">✓ Tandai Semua Dibaca</button>
+          </div>
+        </div>
+        <div class="card">
+          <div style="padding:18px;display:flex;flex-direction:column;gap:9px">
+            <template x-if="items.length===0">
+              <div style="text-align:center;padding:50px;color:var(--text3)">
+                <div style="font-size:36px;opacity:.25;margin-bottom:10px">🔔</div>
+                <div style="color:var(--text2)">Tidak ada notifikasi</div>
+              </div>
+            </template>
+            <template x-for="n in items" :key="n.id">
+              <div class="notif-item" :class="{unread:!n.read}" @click="n.read=true" style="cursor:pointer">
+                <div class="notif-dot" :style="'background:'+n.color"></div>
+                <div class="notif-body">
+                  <h4 x-text="n.title"></h4>
+                  <p x-text="n.body"></p>
+                </div>
+                <span class="notif-time" x-text="n.time"></span>
+                <button class="act-btn act-delete" style="flex-shrink:0;margin-left:6px" @click.stop="deleteNotif(n)"
+                  title="Hapus">✕</button>
+              </div>
+            </template>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('notifikasi', 'Notifikasi', 'Notifikasi');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

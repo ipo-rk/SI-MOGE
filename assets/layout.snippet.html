@@ -1,0 +1,156 @@
+<!--
+  ============================================================
+  SIMGK DEIYAI — Shared Layout Snippet
+  Copy this sidebar + topbar block into every page in /pages/
+  ============================================================
+
+  USAGE: Each page in /pages/ uses this structure:
+  ┌─────────────────────────────────────────────────────────┐
+  │ <body x-data="layout('page-id')">                       │
+  │   <!-- Sidebar Overlay (mobile) -->                     │
+  │   <div class="sidebar-overlay"                          │
+  │        :class="{open: sidebarOpen}"                     │
+  │        @click="closeSidebar()"></div>                   │
+  │                                                         │
+  │   <div class="app-layout">                              │
+  │     <!-- SIDEBAR -->                                    │
+  │     [sidebar HTML below]                                │
+  │                                                         │
+  │     <!-- MAIN AREA -->                                  │
+  │     <div class="main-area">                             │
+  │       <!-- TOPBAR -->                                   │
+  │       [topbar HTML below]                               │
+  │                                                         │
+  │       <!-- PAGE CONTENT -->                             │
+  │       <main class="page-content" x-data="pageName">    │
+  │         ... page-specific content ...                   │
+  │       </main>                                           │
+  │     </div>                                              │
+  │   </div>                                                │
+  │ </body>                                                 │
+  └─────────────────────────────────────────────────────────┘
+
+  NOTE: pages are in /pages/ subdirectory,
+  so asset paths use ../assets/...
+-->
+
+<!-- ═══ SIDEBAR ═══ -->
+<aside class="sidebar" :class="{ open: sidebarOpen }">
+
+  <!-- Logo -->
+  <a href="../pages/dashboard.html" class="sidebar-logo">
+    <div class="logo-mark">⛪</div>
+    <div class="logo-text">
+      <h1>SIMGK Deiyai</h1>
+      <p>Koordinator Papua</p>
+    </div>
+  </a>
+
+  <!-- Navigation -->
+  <nav class="sidebar-nav">
+
+    <div class="nav-section">
+      <span class="nav-label">Utama</span>
+      <a href="dashboard.html"  class="nav-item" :class="{ active: currentPage==='dashboard' }">
+        <span class="nav-icon">📊</span> Dashboard
+      </a>
+      <a href="statistik.html"  class="nav-item" :class="{ active: currentPage==='statistik' }">
+        <span class="nav-icon">📈</span> Statistik
+      </a>
+      <a href="notifikasi.html" class="nav-item" :class="{ active: currentPage==='notifikasi' }">
+        <span class="nav-icon">🔔</span> Notifikasi
+        <span class="nav-badge" x-show="notifCount > 0" x-text="notifCount"></span>
+      </a>
+      <a href="pengumuman.html" class="nav-item" :class="{ active: currentPage==='pengumuman' }">
+        <span class="nav-icon">📢</span> Pengumuman
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <span class="nav-label">Manajemen</span>
+      <a href="kelasis.html"  class="nav-item" :class="{ active: currentPage==='kelasis' }">
+        <span class="nav-icon">🏛️</span> Kelasis
+      </a>
+      <a href="gereja.html"   class="nav-item" :class="{ active: currentPage==='gereja' }">
+        <span class="nav-icon">⛪</span> Gereja
+      </a>
+      <a href="jemaat.html"   class="nav-item" :class="{ active: currentPage==='jemaat' }">
+        <span class="nav-icon">👥</span> Jemaat
+      </a>
+      <a href="kegiatan.html" class="nav-item" :class="{ active: currentPage==='kegiatan' }">
+        <span class="nav-icon">📅</span> Kegiatan
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <span class="nav-label">Laporan</span>
+      <a href="laporan.html"  class="nav-item" :class="{ active: currentPage==='laporan' }">
+        <span class="nav-icon">📋</span> Laporan Pelayanan
+      </a>
+      <a href="dokumen.html"  class="nav-item" :class="{ active: currentPage==='dokumen' }">
+        <span class="nav-icon">📁</span> Dokumen
+      </a>
+      <a href="export.html"   class="nav-item" :class="{ active: currentPage==='export' }">
+        <span class="nav-icon">⬇️</span> Export Data
+      </a>
+    </div>
+
+    <div class="nav-section">
+      <span class="nav-label">Sistem</span>
+      <a href="users.html"      class="nav-item" :class="{ active: currentPage==='users' }">
+        <span class="nav-icon">👤</span> Pengguna
+      </a>
+      <a href="actlog.html"     class="nav-item" :class="{ active: currentPage==='actlog' }">
+        <span class="nav-icon">📜</span> Activity Log
+      </a>
+      <a href="pengaturan.html" class="nav-item" :class="{ active: currentPage==='pengaturan' }">
+        <span class="nav-icon">⚙️</span> Pengaturan
+      </a>
+    </div>
+
+  </nav>
+
+  <!-- Footer user -->
+  <div class="sidebar-footer">
+    <div class="sidebar-user">
+      <div class="user-avatar" x-text="user?.initials || 'SA'"></div>
+      <div>
+        <div class="user-name"  x-text="user?.name  || '—'"></div>
+        <div class="user-role"  x-text="user?.role  || '—'"></div>
+      </div>
+      <a href="../index.html" class="logout-btn" @click.prevent="logout()" title="Logout">🚪</a>
+    </div>
+  </div>
+
+</aside>
+
+<!-- ═══ TOPBAR ═══ -->
+<header class="topbar">
+  <div class="topbar-left">
+    <!-- Mobile menu btn -->
+    <button class="topbar-btn" @click="toggleSidebar()" style="display:none" id="menuBtn">☰</button>
+
+    <div>
+      <div class="topbar-page-title" id="pageHeading">Halaman</div>
+      <div class="topbar-breadcrumb">
+        <span>SIMGK Deiyai</span>
+        <span>›</span>
+        <span id="pageCrumb">...</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="topbar-right">
+    <div class="topbar-search">
+      <span class="s-icon">🔍</span>
+      <input type="text" placeholder="Cari data...">
+    </div>
+
+    <a href="notifikasi.html" class="topbar-btn" title="Notifikasi">
+      🔔
+      <span class="notif-dot" x-show="notifCount > 0"></span>
+    </a>
+
+    <a href="../index.html" class="topbar-btn" @click.prevent="logout()" title="Logout">🚪</a>
+  </div>
+</header>

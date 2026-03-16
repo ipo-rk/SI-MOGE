@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Activity Log</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('actlog')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="actlogPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Activity Log</h2>
+            <p>Rekam jejak aktivitas seluruh pengguna sistem</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline">⬇ Export Log</button>
+            <button class="btn btn-danger" @click="clearLog()">🗑 Bersihkan Log</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <select class="f-select" x-model="filterType">
+            <option value="">Semua Tipe</option>
+            <option value="LOGIN">LOGIN</option>
+            <option value="CREATE">CREATE</option>
+            <option value="UPDATE">UPDATE</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+          <input class="f-input" type="text" placeholder="Cari user atau aksi..." x-model="search" style="width:240px">
+          <button class="btn btn-ghost btn-sm" x-show="filterType||search" @click="filterType='';search=''">✕
+            Reset</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size:13px;font-weight:600;color:var(--text)"
+              x-text="filtered.length+' aktivitas tercatat'"></div>
+          </div>
+          <div>
+            <template x-if="filtered.length===0">
+              <div style="text-align:center;padding:50px;color:var(--text3)">
+                <div style="font-size:32px;opacity:.25;margin-bottom:8px">📜</div>
+                <div style="color:var(--text2)">Log kosong</div>
+              </div>
+            </template>
+            <template x-for="l in filtered" :key="l.time+l.user+l.action">
+              <div class="log-row">
+                <span class="log-time" x-text="l.time"></span>
+                <span class="log-user" x-text="l.user"></span>
+                <span class="log-desc" x-text="l.action"></span>
+                <span class="log-tag" :class="l.typeClass" x-text="l.type"></span>
+              </div>
+            </template>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    // Guard: halaman ini hanya untuk Super Admin
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('simgk_user') || 'null');
+        if (!u || u.role !== 'Super Admin') {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (e) { window.location.href = 'dashboard.html'; }
+    })();
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('actlog', 'Activity Log', 'Activity Log');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

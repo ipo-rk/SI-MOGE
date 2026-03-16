@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Pengaturan Sistem</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('pengaturan')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="pengaturanPage">
+
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Pengaturan Sistem</h2>
+            <p>Konfigurasi umum SIMGK Deiyai</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-primary" @click="save()">
+              <span x-show="!saved">💾 Simpan</span>
+              <span x-show="saved" style="color:#08111e">✓ Tersimpan!</span>
+            </button>
+          </div>
+        </div>
+        <div class="settings-grid">
+          <!-- Umum -->
+          <div class="settings-card">
+            <div class="settings-title">⚙️ Pengaturan Umum</div>
+            <div style="display:flex;flex-direction:column;gap:12px">
+              <div class="form-group"><label class="form-label">Nama Sistem</label><input class="form-input" type="text"
+                  x-model="settings.namaSistem"></div>
+              <div class="form-group"><label class="form-label">Nama Koordinator</label><input class="form-input"
+                  type="text" x-model="settings.namaKoordinator"></div>
+              <div class="form-group"><label class="form-label">Tahun Pelayanan</label><input class="form-input"
+                  type="text" x-model="settings.tahunPelayanan"></div>
+              <div class="form-group"><label class="form-label">Kontak Koordinator</label><input class="form-input"
+                  type="text" x-model="settings.kontak"></div>
+              <div class="form-group"><label class="form-label">Logo Gereja</label><input class="form-input" type="file"
+                  accept="image/*"></div>
+            </div>
+          </div>
+          <!-- Keamanan -->
+          <div class="settings-card">
+            <div class="settings-title">🔒 Keamanan Sistem</div>
+            <div>
+              <div class="settings-row">
+                <div>
+                  <div class="sr-label">Session Timeout</div>
+                  <div class="sr-desc">Auto logout setelah 30 menit tidak aktif</div>
+                </div>
+                <label class="toggle"><input type="checkbox" x-model="security.sessionTimeout"><span
+                    class="toggle-track"></span></label>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="sr-label">Login Security Log</div>
+                  <div class="sr-desc">Catat semua percobaan login</div>
+                </div>
+                <label class="toggle"><input type="checkbox" x-model="security.loginLog"><span
+                    class="toggle-track"></span></label>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="sr-label">Enkripsi Password</div>
+                  <div class="sr-desc">bcrypt hash — selalu aktif</div>
+                </div>
+                <label class="toggle"><input type="checkbox" x-model="security.enkripsi"><span
+                    class="toggle-track"></span></label>
+              </div>
+              <div class="settings-row">
+                <div>
+                  <div class="sr-label">Notifikasi Email</div>
+                  <div class="sr-desc">Kirim notifikasi via email</div>
+                </div>
+                <label class="toggle"><input type="checkbox" x-model="security.emailNotif"><span
+                    class="toggle-track"></span></label>
+              </div>
+            </div>
+          </div>
+          <!-- Backup -->
+          <div class="settings-card">
+            <div class="settings-title">💾 Backup Database</div>
+            <div style="font-size:12.5px;color:var(--text3);margin-bottom:14px">Backup terakhir: 11 Nov 2024 pukul 23:00
+            </div>
+            <div style="display:flex;flex-direction:column;gap:9px">
+              <button class="btn btn-outline" style="justify-content:center" @click="backupNow()">🔄 Backup
+                Sekarang</button>
+              <button class="btn btn-outline" style="justify-content:center">⬇ Download Backup</button>
+              <button class="btn btn-danger" style="justify-content:center">♻️ Restore Backup</button>
+            </div>
+          </div>
+          <!-- Info Sistem -->
+          <div class="settings-card">
+            <div class="settings-title">🌐 Informasi Sistem</div>
+            <div>
+              <div class="info-row"><span class="info-key">Nama Sistem</span><span class="info-val"
+                  x-text="settings.namaSistem"></span></div>
+              <div class="info-row"><span class="info-key">Versi</span><span class="info-val">v1.0.0</span></div>
+              <div class="info-row"><span class="info-key">Total User</span><span class="info-val">14 akun</span></div>
+              <div class="info-row"><span class="info-key">Total Kelasis</span><span class="info-val">6 kelasis</span>
+              </div>
+              <div class="info-row"><span class="info-key">Total Gereja</span><span class="info-val">48 gereja</span>
+              </div>
+              <div class="info-row"><span class="info-key">Database</span><span class="info-val"
+                  style="color:var(--teal)">● Online</span></div>
+              <div class="info-row"><span class="info-key">Server</span><span class="info-val"
+                  style="color:var(--teal)">● Running</span></div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    // Guard: halaman ini hanya untuk Super Admin
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('simgk_user') || 'null');
+        if (!u || u.role !== 'Super Admin') {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (e) { window.location.href = 'dashboard.html'; }
+    })();
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('pengaturan', 'Pengaturan Sistem', 'Pengaturan');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

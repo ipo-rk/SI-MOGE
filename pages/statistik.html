@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Statistik Pelayanan</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+
+    /* ── Statistik grid layouts ── */
+
+    /* Baris 1: chart pertumbuhan (2fr) + pie jemaat (1fr) */
+    .stat-row-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    /* Baris 3: 2 progress card berdampingan */
+    .stat-row-progress {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    /* Tablet ≤900px: semua 1 kolom */
+    @media (max-width: 900px) {
+      .stat-row-top {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        margin-bottom: 14px;
+      }
+
+      .stat-row-progress {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      /* Bar chart: kurangi height agar tidak terlalu tinggi di mobile */
+      #chart-bar-kelasis {
+        height: 180px !important;
+      }
+    }
+
+    /* Mobile ≤640px */
+    @media (max-width: 640px) {
+      .stat-row-top {
+        gap: 10px;
+        margin-bottom: 10px;
+      }
+
+      .stat-row-progress {
+        gap: 10px;
+      }
+
+      .stat-mb {
+        margin-bottom: 10px !important;
+      }
+    }
+  </style>
+</head>
+
+<body x-data="layout('statistik')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="statistikPage">
+
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Statistik Pelayanan</h2>
+            <p>Visualisasi data pelayanan Koordinator Deiyai 2024</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline">⬇ Export Laporan</button>
+          </div>
+        </div>
+
+        <!-- Baris 1: Pertumbuhan Jemaat (lebar) + Pie Distribusi (sempit) -->
+        <div class="stat-row-top">
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Pertumbuhan Jemaat</div>
+                <div class="card-subtitle">5 tahun terakhir per kelasis</div>
+              </div>
+            </div>
+            <div style="padding:0 20px 20px">
+              <canvas id="chart-growth" height="100"></canvas>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div>
+                <div class="card-title">Distribusi Jemaat</div>
+                <div class="card-subtitle">Per kelasis 2024</div>
+              </div>
+            </div>
+            <div style="padding:0 20px 20px">
+              <canvas id="chart-pie-jemaat" height="180"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <!-- Baris 2: Bar chart kegiatan — full width -->
+        <div class="card stat-mb" style="margin-bottom:18px">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Kegiatan per Kelasis</div>
+              <div class="card-subtitle">Perbandingan aktivitas pelayanan 2024</div>
+            </div>
+          </div>
+          <div style="padding:0 20px 20px">
+            <canvas id="chart-bar-kelasis" height="70"></canvas>
+          </div>
+        </div>
+
+        <!-- Baris 3: 2 progress card -->
+        <div class="stat-row-progress">
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Gereja per Kelasis</div>
+            </div>
+            <div style="padding:0 20px 20px">
+              <div style="display:flex;flex-direction:column;gap:13px">
+                <template x-for="p in progressKelasis" :key="p.label">
+                  <div class="progress-item">
+                    <div class="progress-row">
+                      <span class="progress-lbl" x-text="p.label"></span>
+                      <span class="progress-val" x-text="p.val+' gereja'"></span>
+                    </div>
+                    <div class="progress-track">
+                      <div class="progress-fill" :style="'width:'+p.pct+'%;background:'+p.color"></div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title">Jenis Kegiatan Terbanyak</div>
+            </div>
+            <div style="padding:0 20px 20px">
+              <div style="display:flex;flex-direction:column;gap:13px">
+                <template x-for="p in progressKegiatan" :key="p.label">
+                  <div class="progress-item">
+                    <div class="progress-row">
+                      <span class="progress-lbl" x-text="p.label"></span>
+                      <span class="progress-val" x-text="p.val+' kegiatan'"></span>
+                    </div>
+                    <div class="progress-track">
+                      <div class="progress-fill" :style="'width:'+p.pct+'%;background:'+p.color"></div>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /stat-row-progress -->
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="../assets/js/charts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('simgk_user') || 'null');
+        if (!u || u.role === 'Operator Gereja') window.location.href = 'dashboard.html';
+      } catch (e) { window.location.href = 'dashboard.html'; }
+    })();
+    document.addEventListener('DOMContentLoaded', function () {
+      buildLayout('statistik', 'Statistik Pelayanan', 'Statistik');
+    });
+  </script>
+</body>
+
+</html>

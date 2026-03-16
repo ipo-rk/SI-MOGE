@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Pengumuman</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('pengumuman')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="pengumumanPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Pengumuman</h2>
+            <p>Pengumuman dari Koordinator kepada seluruh Kelasis</p>
+          </div>
+          <div class="page-actions"><button class="btn btn-primary" @click="openAdd()">＋ Buat Pengumuman</button></div>
+        </div>
+        <template x-if="items.length===0">
+          <div class="card" style="text-align:center;padding:50px;color:var(--text3)">
+            <div style="font-size:36px;opacity:.25;margin-bottom:10px">📢</div>
+            <div style="color:var(--text2)">Belum ada pengumuman</div>
+          </div>
+        </template>
+        <template x-for="(a,idx) in items" :key="a.judul+a.tgl">
+          <div class="announce-card">
+            <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+              <div style="flex:1">
+                <h4 x-text="a.judul"></h4>
+                <p x-text="a.body"></p>
+                <div class="announce-meta">
+                  <span class="badge" :class="a.tujuanBadge" x-text="a.tujuan"></span>
+                  <span>Oleh: <span x-text="a.oleh"></span></span>
+                  <span>• <span x-text="a.tgl"></span></span>
+                </div>
+              </div>
+              <div style="display:flex;gap:6px;flex-shrink:0;margin-top:2px">
+                <button class="act-btn act-edit" title="Edit" @click="openEdit(a,idx)">✏️</button>
+                <button class="act-btn act-delete" title="Hapus" @click="remove(a)">🗑</button>
+              </div>
+            </div>
+          </div>
+        </template>
+
+        <!-- Modal -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="editMode?'✏️ Edit Pengumuman':'📢 Buat Pengumuman'"></div>
+              <button class="modal-close" @click="showModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-error" x-show="formError" x-cloak x-text="formError" style="margin-bottom:12px"></div>
+              <div class="form-grid">
+                <div class="form-group form-full"><label class="form-label">Judul <span
+                      style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="text" x-model="form.judul" placeholder="Judul pengumuman..."
+                    @input="formError=''">
+                </div>
+                <div class="form-group"><label class="form-label">Tujuan</label>
+                  <select class="form-select" x-model="form.tujuan">
+                    <option>Semua Kelasis</option>
+                    <option>Seluruh Gereja</option>
+                    <option>Admin Kelasis</option>
+                    <option>Tigi</option>
+                    <option>Tigi Barat</option>
+                    <option>Yatamo</option>
+                    <option>Wagamo</option>
+                    <option>Tigi Utara</option>
+                    <option>Debey</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Prioritas</label>
+                  <select class="form-select" x-model="form.prioritas">
+                    <option>Normal</option>
+                    <option>Penting</option>
+                    <option>Mendesak</option>
+                  </select>
+                </div>
+                <div class="form-group form-full"><label class="form-label">Isi Pengumuman <span
+                      style="color:var(--rose)">*</span></label>
+                  <textarea class="form-textarea" style="min-height:120px" x-model="form.body"
+                    placeholder="Tulis isi pengumuman..." @input="formError=''"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()" x-text="editMode?'💾 Simpan':'📢 Kirim'"></button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('pengumuman', 'Pengumuman', 'Pengumuman');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

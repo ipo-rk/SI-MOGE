@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+
+    /* ── Dashboard grid layouts ── */
+
+    /* Charts row: 2fr 1fr → di tablet jadi 1 kolom */
+    .dash-charts-row {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 18px;
+      margin-bottom: 20px;
+    }
+
+    /* Bottom row: 1fr 1fr → di mobile jadi 1 kolom */
+    .dash-bottom-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 18px;
+    }
+
+    /* Tablet ≤900px: semua jadi 1 kolom */
+    @media (max-width: 900px) {
+      .dash-charts-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+
+      .dash-bottom-row {
+        grid-template-columns: 1fr;
+        gap: 14px;
+      }
+    }
+
+    /* Mobile ≤640px: gap lebih kecil */
+    @media (max-width: 640px) {
+      .dash-charts-row {
+        gap: 10px;
+        margin-bottom: 14px;
+      }
+
+      .dash-bottom-row {
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body x-data="layout('dashboard')">
+
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+
+  <div class="app-layout">
+    <div class="main-area">
+      <main class="page-content" x-data="dashboard">
+
+        <!-- Welcome banner -->
+        <div class="page-header" style="margin-bottom:20px">
+          <div>
+            <h2 class="page-title">
+              Selamat datang,
+              <span x-text="$store.auth.user?.name || '—'"></span>
+            </h2>
+            <p class="page-desc">
+              <template x-if="$store.auth.user?.role === 'Super Admin'">
+                <span>Login sebagai <strong>Super Admin</strong> — akses penuh ke seluruh sistem.</span>
+              </template>
+              <template x-if="$store.auth.user?.role === 'Admin Kelasis'">
+                <span>Login sebagai <strong>Admin Kelasis</strong> — kelola data kelasis dan laporan pelayanan.</span>
+              </template>
+              <template x-if="$store.auth.user?.role === 'Operator Gereja'">
+                <span>Login sebagai <strong>Operator Gereja</strong> — catat kegiatan dan data jemaat gereja
+                  Anda.</span>
+              </template>
+            </p>
+          </div>
+        </div>
+
+        <!-- ── Stat Cards ── -->
+        <div class="stats-grid">
+
+          <!-- Kelasis — SA & AK saja -->
+          <template x-if="$store.auth.user?.role !== 'Operator Gereja'">
+            <div class="stat-card" style="--c:var(--gold)">
+              <div class="stat-top">
+                <div class="stat-icon-box" style="--ic:var(--gold-dim)">🏛️</div>
+                <span class="stat-trend trend-up">+1</span>
+              </div>
+              <div class="stat-value" x-text="stats.totalKelasis"></div>
+              <div class="stat-label">Total Kelasis</div>
+            </div>
+          </template>
+
+          <!-- Gereja — semua role -->
+          <div class="stat-card" style="--c:var(--blue2)">
+            <div class="stat-top">
+              <div class="stat-icon-box" style="--ic:rgba(52,120,213,0.15)">⛪</div>
+              <span class="stat-trend trend-up">+3</span>
+            </div>
+            <div class="stat-value" x-text="stats.totalGereja"></div>
+            <div class="stat-label">Total Gereja</div>
+          </div>
+
+          <!-- Jemaat — semua role -->
+          <div class="stat-card" style="--c:var(--teal)">
+            <div class="stat-top">
+              <div class="stat-icon-box" style="--ic:rgba(22,184,154,0.15)">👥</div>
+              <span class="stat-trend trend-up">+124</span>
+            </div>
+            <div class="stat-value" x-text="stats.totalJemaat.toLocaleString('id')"></div>
+            <div class="stat-label">Total Jemaat</div>
+          </div>
+
+          <!-- Pendeta — SA & AK saja -->
+          <template x-if="$store.auth.user?.role !== 'Operator Gereja'">
+            <div class="stat-card" style="--c:var(--violet)">
+              <div class="stat-top">
+                <div class="stat-icon-box" style="--ic:rgba(138,108,240,0.15)">🙏</div>
+                <span class="stat-trend trend-up">+2</span>
+              </div>
+              <div class="stat-value" x-text="stats.totalPendeta"></div>
+              <div class="stat-label">Total Pendeta</div>
+            </div>
+          </template>
+
+          <!-- Kegiatan — semua role -->
+          <div class="stat-card" style="--c:var(--rose)">
+            <div class="stat-top">
+              <div class="stat-icon-box" style="--ic:rgba(221,85,102,0.15)">📅</div>
+              <span class="stat-trend trend-up">+8</span>
+            </div>
+            <div class="stat-value" x-text="stats.totalKegiatan"></div>
+            <div class="stat-label">Total Kegiatan</div>
+          </div>
+
+          <!-- Laporan — SA & AK saja -->
+          <template x-if="$store.auth.user?.role !== 'Operator Gereja'">
+            <div class="stat-card" style="--c:var(--lime)">
+              <div class="stat-top">
+                <div class="stat-icon-box" style="--ic:rgba(61,207,110,0.12)">📋</div>
+                <span class="stat-trend trend-down">-2</span>
+              </div>
+              <div class="stat-value" x-text="stats.totalLaporan"></div>
+              <div class="stat-label">Laporan Masuk</div>
+            </div>
+          </template>
+
+        </div><!-- /stats-grid -->
+
+        <!-- ══ Konten SA & AK ══ -->
+        <template x-if="$store.auth.user?.role !== 'Operator Gereja'">
+          <div>
+
+            <!-- Charts row: 2fr 1fr → 1 kolom di tablet -->
+            <div class="dash-charts-row">
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Kegiatan Per Bulan</div>
+                    <div class="card-subtitle">Tahun 2024 — Seluruh Kelasis</div>
+                  </div>
+                  <a href="statistik.html" class="card-action">Lihat Detail</a>
+                </div>
+                <div style="padding:0 20px 20px">
+                  <canvas id="chart-kegiatan" height="100"></canvas>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Gereja per Kelasis</div>
+                    <div class="card-subtitle">Distribusi 48 gereja</div>
+                  </div>
+                </div>
+                <div style="padding:0 20px 20px">
+                  <canvas id="chart-kelasis-donut" height="180"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom row: 1fr 1fr → 1 kolom di mobile -->
+            <div class="dash-bottom-row">
+
+              <!-- Laporan terbaru -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Laporan Terbaru</div>
+                    <div class="card-subtitle">5 laporan terakhir masuk</div>
+                  </div>
+                  <a href="laporan.html" class="card-action">Semua →</a>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Kelasis</th>
+                        <th>Jenis</th>
+                        <th>Tanggal</th>
+                        <th>Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="l in recentLaporan" :key="l.kelasis + '_' + l.jenis + '_' + l.periode">
+                        <tr>
+                          <td class="td-primary" x-text="l.kelasis"></td>
+                          <td><span class="badge" :class="l.jenisBadge" x-text="l.jenis"></span></td>
+                          <td x-text="l.tglKirim"></td>
+                          <td>
+                            <span class="badge" :class="l.status === 'Diterima' ? 'badge-teal' : 'badge-amber'"
+                              x-text="l.status === 'Diterima' ? '✓ Diterima' : '⏳ Proses'">
+                            </span>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Notifikasi -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Notifikasi Sistem</div>
+                    <div class="card-subtitle">Aktivitas terbaru</div>
+                  </div>
+                  <a href="notifikasi.html" class="card-action">Semua →</a>
+                </div>
+                <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:9px">
+                  <template x-for="n in $store.notif.items.slice(0,4)" :key="n.id">
+                    <div class="notif-item" :class="{ unread: !n.read }">
+                      <div class="notif-dot" :style="'background:'+n.color"></div>
+                      <div class="notif-body">
+                        <h4 x-text="n.title"></h4>
+                        <p x-text="n.body"></p>
+                      </div>
+                      <span class="notif-time" x-text="n.time"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+            </div><!-- /bottom row SA & AK -->
+          </div>
+        </template>
+
+        <!-- ══ Konten Operator Gereja ══ -->
+        <template x-if="$store.auth.user?.role === 'Operator Gereja'">
+          <div>
+
+            <!-- Chart kegiatan — full width -->
+            <div style="margin-bottom:20px">
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Kegiatan Per Bulan</div>
+                    <div class="card-subtitle">Tahun 2024</div>
+                  </div>
+                </div>
+                <div style="padding:0 20px 20px">
+                  <canvas id="chart-kegiatan-op" height="80"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Bottom row Operator: 1fr 1fr → 1 kolom di mobile -->
+            <div class="dash-bottom-row">
+
+              <!-- Kegiatan terbaru -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Kegiatan Terbaru</div>
+                    <div class="card-subtitle">Aktivitas terakhir tercatat</div>
+                  </div>
+                  <a href="kegiatan.html" class="card-action">Semua →</a>
+                </div>
+                <div class="table-wrap">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Nama Kegiatan</th>
+                        <th>Jenis</th>
+                        <th>Peserta</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="k in $store.data.kegiatan.slice(0,5)" :key="k.nama + '_' + k.tanggal">
+                        <tr>
+                          <td class="td-primary" x-text="k.nama"></td>
+                          <td><span class="badge" :class="k.jenisBadge" x-text="k.jenis"></span></td>
+                          <td x-text="k.peserta"></td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <!-- Notifikasi -->
+              <div class="card">
+                <div class="card-header">
+                  <div>
+                    <div class="card-title">Notifikasi Sistem</div>
+                    <div class="card-subtitle">Aktivitas terbaru</div>
+                  </div>
+                  <a href="notifikasi.html" class="card-action">Semua →</a>
+                </div>
+                <div style="padding:0 18px 18px;display:flex;flex-direction:column;gap:9px">
+                  <template x-for="n in $store.notif.items.slice(0,4)" :key="n.id">
+                    <div class="notif-item" :class="{ unread: !n.read }">
+                      <div class="notif-dot" :style="'background:'+n.color"></div>
+                      <div class="notif-body">
+                        <h4 x-text="n.title"></h4>
+                        <p x-text="n.body"></p>
+                      </div>
+                      <span class="notif-time" x-text="n.time"></span>
+                    </div>
+                  </template>
+                </div>
+              </div>
+
+            </div><!-- /bottom row Operator -->
+          </div>
+        </template>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+  <script src="../assets/js/charts.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      buildLayout('dashboard', 'Dashboard', 'Dashboard');
+    });
+
+    document.addEventListener('alpine:initialized', function () {
+      var role = getCurrentRole();
+      if (role === 'Operator Gereja') {
+        setTimeout(function () {
+          var ctx = document.getElementById('chart-kegiatan-op');
+          if (!ctx || !window.Chart) return;
+          new Chart(ctx, {
+            type: 'bar',
+            data: {
+              labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'],
+              datasets: [{
+                label: 'Kegiatan',
+                data: [12, 10, 14, 11, 15, 13, 16, 14, 18, 15, 22, 17],
+                backgroundColor: 'rgba(200,160,32,0.25)',
+                borderColor: '#c8a020',
+                borderWidth: 1.5,
+                borderRadius: 4,
+              }]
+            },
+            options: {
+              responsive: true,
+              plugins: { legend: { display: false } },
+              scales: {
+                x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8899aa', font: { size: 11 } } },
+                y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#8899aa', font: { size: 11 } } }
+              }
+            }
+          });
+        }, 50);
+      } else {
+        setTimeout(function () {
+          if (window.initDashboardCharts) window.initDashboardCharts();
+        }, 50);
+      }
+    });
+  </script>
+</body>
+
+</html>

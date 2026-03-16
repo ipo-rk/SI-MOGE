@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Kelasis</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('kelasis')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+
+
+    <div class="main-area">
+
+
+      <main class="page-content" x-data="kelasisPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Manajemen Kelasis</h2>
+            <p>6 Kelasis aktif di bawah Koordinator Deiyai</p>
+          </div>
+          <div class="page-actions"><button class="btn btn-primary" @click="openAdd()">＋ Tambah Kelasis</button></div>
+        </div>
+
+        <div class="kelasis-grid">
+          <template x-for="k in items" :key="k.id">
+            <div class="kelasis-card" :style="'--kc:'+k.color">
+              <div class="kelasis-id" x-text="k.id"></div>
+              <div class="kelasis-name" x-text="k.nama"></div>
+              <div class="kelasis-ketua">Ketua: <span x-text="k.ketua"></span></div>
+              <div class="kelasis-loc">📍 <span x-text="k.alamat"></span></div>
+              <div class="kelasis-stats">
+                <div class="ks-stat"><span class="ks-val" x-text="k.gereja"></span><span class="ks-lbl">Gereja</span>
+                </div>
+                <div class="ks-stat"><span class="ks-val" x-text="k.jemaat.toLocaleString('id')"></span><span
+                    class="ks-lbl">Jemaat</span></div>
+                <div class="ks-stat"><span class="ks-val" x-text="k.pendeta"></span><span class="ks-lbl">Pendeta</span>
+                </div>
+              </div>
+              <div style="display:flex;gap:7px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+                <button class="btn btn-outline btn-xs" @click="openEdit(k)">✏️ Edit</button>
+                <button class="btn btn-danger btn-xs" @click="remove(k)">🗑 Hapus</button>
+              </div>
+            </div>
+          </template>
+        </div>
+
+        <!-- Modal Kelasis -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="editMode?'Edit Kelasis':'Tambah Kelasis Baru'"></div>
+              <button class="modal-close" @click="showModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-grid">
+                <div class="form-group form-full"><label class="form-label">Nama Kelasis *</label><input
+                    class="form-input" type="text" x-model="form.nama" placeholder="Contoh: Kelasis Tigi"></div>
+                <div class="form-group"><label class="form-label">Ketua Kelasis</label><input class="form-input"
+                    type="text" x-model="form.ketua" placeholder="Nama ketua"></div>
+                <div class="form-group"><label class="form-label">Nomor Kontak</label><input class="form-input"
+                    type="text" x-model="form.kontak" placeholder="+62 XXX-XXXX-XXXX"></div>
+                <div class="form-group form-full"><label class="form-label">Alamat</label><textarea
+                    class="form-textarea" x-model="form.alamat" placeholder="Alamat lengkap kelasis"></textarea></div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()">💾 Simpan</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    // Guard: halaman ini hanya untuk Super Admin & Admin Kelasis
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('simgk_user') || 'null');
+        if (!u || u.role === 'Operator Gereja') {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (e) { window.location.href = 'dashboard.html'; }
+    })();
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('kelasis', 'Manajemen Kelasis', 'Kelasis');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

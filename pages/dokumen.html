@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Dokumen</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('dokumen')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="dokumenPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Manajemen Dokumen</h2>
+            <p>Arsip dokumen gereja dan pelayanan</p>
+          </div>
+          <div class="page-actions"><button class="btn btn-primary" @click="openUpload()">⬆ Upload Dokumen</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <select class="f-select" x-model="filterKelasis">
+            <option value="">Semua Kelasis</option>
+            <option>Tigi</option>
+            <option>Tigi Barat</option>
+            <option>Yatamo</option>
+            <option>Wagamo</option>
+            <option>Tigi Utara</option>
+            <option>Debey</option>
+          </select>
+          <input class="f-input" type="text" placeholder="Cari nama dokumen..." x-model="search" style="width:240px">
+          <button class="btn btn-ghost btn-sm" x-show="filterKelasis||search" @click="filterKelasis='';search=''">✕
+            Reset</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size:13px;font-weight:600;color:var(--text)" x-text="filtered.length+' dokumen ditemukan'">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Dokumen</th>
+                  <th>Jenis</th>
+                  <th>Kelasis</th>
+                  <th>Ukuran</th>
+                  <th>Tgl Upload</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-if="filtered.length===0">
+                  <tr>
+                    <td colspan="6" style="text-align:center;padding:40px;color:var(--text3)">
+                      <div style="font-size:32px;opacity:.25;margin-bottom:8px">📁</div>
+                      <div style="color:var(--text2)">Tidak ada dokumen ditemukan</div>
+                    </td>
+                  </tr>
+                </template>
+                <template x-for="d in filtered" :key="d.nama">
+                  <tr>
+                    <td class="td-primary">📄 <span x-text="d.nama"></span></td>
+                    <td><span class="badge" :class="d.jenisBadge" x-text="d.jenis"></span></td>
+                    <td><span class="badge" :class="d.kelasisBadge" x-text="d.kelasis"></span></td>
+                    <td style="font-family:'JetBrains Mono',monospace;font-size:12px" x-text="d.ukuran"></td>
+                    <td x-text="d.tgl"></td>
+                    <td>
+                      <div style="display:flex;gap:5px">
+                        <button class="act-btn act-view" title="Download" @click="download(d)">⬇</button>
+                        <button class="act-btn act-delete" title="Hapus" @click="remove(d)">🗑</button>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Modal Upload -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+            <div class="modal-head">
+              <div class="modal-head-title">⬆ Upload Dokumen</div>
+              <button class="modal-close" @click="showModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-error" x-show="formError" x-cloak x-text="formError" style="margin-bottom:12px"></div>
+              <div class="form-grid">
+                <div class="form-group form-full"><label class="form-label">Nama Dokumen <span
+                      style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="text" x-model="form.nama" placeholder="Nama dokumen lengkap..."
+                    @input="formError=''">
+                </div>
+                <div class="form-group"><label class="form-label">Jenis Dokumen</label>
+                  <select class="form-select" x-model="form.jenis">
+                    <option>SK Pelayanan</option>
+                    <option>Laporan</option>
+                    <option>Notulen</option>
+                    <option>Dokumentasi</option>
+                    <option>Lainnya</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Kelasis <span
+                      style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.kelasis" @change="formError=''"
+                    :style="formError&&!form.kelasis?'border-color:var(--rose)':''">
+                    <option value="">— Pilih Kelasis —</option>
+                    <option>Tigi</option>
+                    <option>Tigi Barat</option>
+                    <option>Yatamo</option>
+                    <option>Wagamo</option>
+                    <option>Tigi Utara</option>
+                    <option>Debey</option>
+                  </select>
+                </div>
+                <div class="form-group form-full"><label class="form-label">File Dokumen</label>
+                  <input class="form-input" type="file" accept=".pdf,.doc,.docx,.xlsx,.zip,.jpg,.png">
+                </div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()">⬆ Upload</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('dokumen', 'Manajemen Dokumen', 'Dokumen');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

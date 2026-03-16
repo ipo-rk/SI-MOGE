@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Export Data</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+
+    /* Grid export cards — responsif */
+    .export-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    /* Tablet: 2 kolom */
+    @media (max-width: 900px) {
+      .export-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+      }
+    }
+
+    /* Mobile: 1 kolom */
+    @media (max-width: 540px) {
+      .export-grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    }
+
+    .export-card {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      padding: 24px 16px;
+    }
+
+    .export-card-icon {
+      font-size: 38px;
+      margin-bottom: 12px;
+      line-height: 1;
+    }
+
+    .export-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 5px;
+    }
+
+    .export-card-desc {
+      font-size: 11.5px;
+      color: var(--text3);
+      margin-bottom: 18px;
+    }
+
+    .export-card-btns {
+      display: flex;
+      gap: 7px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+  </style>
+</head>
+
+<body x-data="layout('export')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="exportPage">
+
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Export Data</h2>
+            <p>Download data dalam format PDF, Excel, atau CSV</p>
+          </div>
+        </div>
+
+        <div class="export-grid">
+          <template x-for="e in exports" :key="e.title">
+            <div class="card export-card">
+              <div class="export-card-icon" x-text="e.icon"></div>
+              <div class="export-card-title" x-text="e.title"></div>
+              <div class="export-card-desc" x-text="e.desc"></div>
+              <div class="export-card-btns">
+                <template x-for="f in e.formats" :key="f">
+                  <button class="btn btn-outline btn-sm" @click="doExport(e.title, f)" x-text="f"></button>
+                </template>
+              </div>
+            </div>
+          </template>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('simgk_user') || 'null');
+        if (!u || u.role === 'Operator Gereja') window.location.href = 'dashboard.html';
+      } catch (e) { window.location.href = 'dashboard.html'; }
+    })();
+    document.addEventListener('DOMContentLoaded', function () {
+      buildLayout('export', 'Export Data', 'Export');
+    });
+  </script>
+</body>
+
+</html>

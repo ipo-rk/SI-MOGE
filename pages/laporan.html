@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Laporan</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('laporan')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="laporanPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Laporan Pelayanan</h2>
+            <p>Laporan dari seluruh kelasis kepada Koordinator</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline">⬇ Export PDF</button>
+            <button class="btn btn-primary" @click="openAdd()">＋ Buat Laporan</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <select class="f-select" x-model="filterJenis">
+            <option value="">Semua Jenis</option>
+            <template x-for="j in jenisOptions" :key="j">
+              <option :value="j" x-text="j"></option>
+            </template>
+          </select>
+          <select class="f-select" x-model="filterKelasis">
+            <option value="">Semua Kelasis</option>
+            <option>Tigi</option>
+            <option>Tigi Barat</option>
+            <option>Yatamo</option>
+            <option>Wagamo</option>
+            <option>Tigi Utara</option>
+            <option>Debey</option>
+          </select>
+          <select class="f-select" x-model="filterStatus">
+            <option value="">Semua Status</option>
+            <option>Diterima</option>
+            <option>Proses</option>
+          </select>
+          <button class="btn btn-ghost btn-sm" x-show="filterJenis||filterKelasis||filterStatus"
+            @click="filterJenis='';filterKelasis='';filterStatus=''">✕ Reset</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size:13px;font-weight:600;color:var(--text)" x-text="filtered.length+' laporan ditemukan'">
+            </div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Judul Laporan</th>
+                  <th>Kelasis</th>
+                  <th>Jenis</th>
+                  <th>Periode</th>
+                  <th>Tgl Kirim</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-if="filtered.length===0">
+                  <tr>
+                    <td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">
+                      <div style="font-size:32px;opacity:.25;margin-bottom:8px">📋</div>
+                      <div style="color:var(--text2)">Tidak ada laporan ditemukan</div>
+                    </td>
+                  </tr>
+                </template>
+                <template x-for="l in filtered" :key="l.judul+l.kelasis+l.periode">
+                  <tr>
+                    <td class="td-primary" x-text="l.judul"></td>
+                    <td><span class="badge" :class="l.kelasisBadge" x-text="l.kelasis"></span></td>
+                    <td><span class="badge" :class="l.jenisBadge" x-text="l.jenis"></span></td>
+                    <td x-text="l.periode||'—'"></td>
+                    <td x-text="l.tglKirim||'—'"></td>
+                    <td><span class="badge" :class="statusBadge(l.status)"
+                        x-text="l.status==='Diterima'?'✓ Diterima':'⏳ '+l.status"></span></td>
+                    <td>
+                      <div style="display:flex;gap:5px">
+                        <button class="act-btn act-view" title="Detail" @click="openView(l)">👁</button>
+                        <button class="act-btn act-edit" title="Edit" @click="openEdit(l)">✏️</button>
+                        <button class="act-btn" title="Setujui"
+                          style="background:rgba(22,184,154,.13);color:var(--teal)" @click="approve(l)"
+                          x-show="l.status==='Proses'">✓</button>
+                        <button class="act-btn act-delete" title="Hapus" @click="remove(l)">🗑</button>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Modal Tambah/Edit -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="editMode?'✏️ Edit Laporan':'📤 Buat Laporan'"></div>
+              <button class="modal-close" @click="showModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-error" x-show="formError" x-cloak x-text="formError" style="margin-bottom:12px"></div>
+              <div class="form-grid">
+                <div class="form-group form-full"><label class="form-label">Judul Laporan <span
+                      style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="text" x-model="form.judul"
+                    placeholder="Contoh: Laporan Bulanan Oktober 2024" @input="formError=''">
+                </div>
+                <div class="form-group"><label class="form-label">Jenis <span style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.jenis">
+                    <template x-for="j in jenisOptions" :key="j">
+                      <option :value="j" x-text="j"></option>
+                    </template>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Kelasis <span
+                      style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.kelasis" @change="formError=''"
+                    :style="formError&&!form.kelasis?'border-color:var(--rose)':''">
+                    <option value="">— Pilih Kelasis —</option>
+                    <option>Tigi</option>
+                    <option>Tigi Barat</option>
+                    <option>Yatamo</option>
+                    <option>Wagamo</option>
+                    <option>Tigi Utara</option>
+                    <option>Debey</option>
+                  </select>
+                </div>
+                <div class="form-group form-full"><label class="form-label">Periode</label>
+                  <input class="form-input" type="month" x-model="form.periode">
+                </div>
+                <div class="form-group form-full"><label class="form-label">Isi Laporan</label>
+                  <textarea class="form-textarea" style="min-height:110px" x-model="form.isi"
+                    placeholder="Tulis ringkasan isi laporan..."></textarea>
+                </div>
+                <div class="form-group form-full"><label class="form-label">Lampiran <span
+                      style="font-size:10.5px;color:var(--text3)">(opsional)</span></label>
+                  <input class="form-input" type="file" accept=".pdf,.doc,.docx,.xlsx">
+                </div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()" x-text="editMode?'💾 Simpan':'📤 Kirim Laporan'"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal View -->
+        <div class="modal-backdrop" x-show="viewModal" x-cloak @click.self="viewModal=false">
+          <div class="modal-box" x-show="viewItem">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="viewItem?.judul"></div>
+              <button class="modal-close" @click="viewModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <template
+                x-for="[k,v] in Object.entries({Kelasis:viewItem?.kelasis,Jenis:viewItem?.jenis,Periode:viewItem?.periode,'Tgl Kirim':viewItem?.tglKirim,Status:viewItem?.status,'Isi Laporan':viewItem?.isi})"
+                :key="k">
+                <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px">
+                  <span
+                    style="width:110px;flex-shrink:0;color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px"
+                    x-text="k"></span>
+                  <span style="color:var(--text)" x-text="v||'—'"></span>
+                </div>
+              </template>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="viewModal=false">Tutup</button>
+              <button class="btn btn-primary" @click="viewModal=false;openEdit(viewItem)">✏️ Edit</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    // Guard: halaman ini hanya untuk Super Admin & Admin Kelasis
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('simgk_user') || 'null');
+        if (!u || u.role === 'Operator Gereja') {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (e) { window.location.href = 'dashboard.html'; }
+    })();
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('laporan', 'Laporan Pelayanan', 'Laporan');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

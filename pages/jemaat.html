@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Jemaat</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('jemaat')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="jemaatPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Manajemen Jemaat</h2>
+            <p x-text="allItems.length.toLocaleString('id')+' jemaat terdaftar'"></p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline">⬆ Import</button>
+            <button class="btn btn-outline">⬇ Export</button>
+            <button class="btn btn-primary" @click="openAdd()">＋ Tambah Jemaat</button>
+          </div>
+        </div>
+        <div class="toolbar">
+          <select class="f-select" x-model="filterKelasis" @change="resetPage()">
+            <option value="">Semua Kelasis</option>
+            <option>Tigi</option>
+            <option>Tigi Barat</option>
+            <option>Yatamo</option>
+            <option>Wagamo</option>
+            <option>Tigi Utara</option>
+            <option>Debey</option>
+          </select>
+          <select class="f-select" x-model="filterJK" @change="resetPage()">
+            <option value="">Jenis Kelamin</option>
+            <option value="L">Laki-laki</option>
+            <option value="P">Perempuan</option>
+          </select>
+          <select class="f-select" x-model="filterStatus" @change="resetPage()">
+            <option value="">Semua Status</option>
+            <option>Aktif</option>
+            <option>Pindah</option>
+            <option>Meninggal</option>
+          </select>
+          <input class="f-input" type="text" placeholder="Cari nama jemaat..." x-model="search" @input="resetPage()"
+            style="width:210px">
+          <button class="btn btn-ghost btn-sm" x-show="filterKelasis||filterStatus||filterJK||search"
+            @click="filterKelasis='';filterStatus='';filterJK='';search='';resetPage()">✕ Reset</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size:13px;font-weight:600;color:var(--text)" x-text="filtered.length+' jemaat ditemukan'">
+            </div>
+            <div style="font-size:11.5px;color:var(--text3)" x-text="'Hal '+currentPage+' dari '+totalPages"></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama</th>
+                  <th>JK</th>
+                  <th>Tgl Lahir</th>
+                  <th>Gereja</th>
+                  <th>Kelasis</th>
+                  <th>HP</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-if="filtered.length===0">
+                  <tr>
+                    <td colspan="9" style="text-align:center;padding:40px;color:var(--text3)">
+                      <div style="font-size:32px;opacity:.25;margin-bottom:8px">👥</div>
+                      <div style="color:var(--text2)">Tidak ada jemaat ditemukan</div>
+                    </td>
+                  </tr>
+                </template>
+                <template x-for="j in paginated" :key="j.id">
+                  <tr>
+                    <td class="td-mono" x-text="j.id"></td>
+                    <td class="td-primary" x-text="j.nama"></td>
+                    <td><span class="badge" :class="j.jk==='L'?'badge-blue':'badge-rose'"
+                        x-text="j.jk==='L'?'♂ L':'♀ P'"></span></td>
+                    <td x-text="j.lahir||'—'"></td>
+                    <td x-text="j.gereja||'—'"></td>
+                    <td><span class="badge" :class="j.kelasisBadge" x-text="j.kelasis"></span></td>
+                    <td x-text="j.hp||'—'"></td>
+                    <td><span class="badge"
+                        :class="j.status==='Aktif'?'badge-teal':j.status==='Pindah'?'badge-amber':'badge-rose'"
+                        x-text="j.status"></span></td>
+                    <td>
+                      <div style="display:flex;gap:5px">
+                        <button class="act-btn act-view" title="Detail" @click="openView(j)">👁</button>
+                        <button class="act-btn act-edit" title="Edit" @click="openEdit(j)">✏️</button>
+                        <button class="act-btn act-delete" title="Hapus" @click="remove(j)">🗑</button>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span x-text="'Menampilkan '+paginated.length+' dari '+filtered.length+' jemaat'"></span>
+            <div class="page-btns">
+              <div class="page-btn" @click="currentPage>1&&currentPage--">‹</div>
+              <template x-for="p in pageNumbers" :key="p">
+                <div class="page-btn" :class="{on:p===currentPage}" @click="currentPage=p" x-text="p"></div>
+              </template>
+              <div class="page-btn" @click="currentPage<totalPages&&currentPage++">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Tambah/Edit -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="editMode?'✏️ Edit Data Jemaat':'＋ Tambah Jemaat'"></div>
+              <button class="modal-close" @click="showModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-error" x-show="formError" x-cloak x-text="formError" style="margin-bottom:12px"></div>
+              <div class="form-grid">
+                <div class="form-group form-full"><label class="form-label">Nama Lengkap <span
+                      style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="text" x-model="form.nama" placeholder="Nama lengkap jemaat"
+                    @input="formError=''">
+                </div>
+                <div class="form-group"><label class="form-label">Jenis Kelamin <span
+                      style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.jk">
+                    <option value="L">Laki-laki</option>
+                    <option value="P">Perempuan</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Tanggal Lahir</label>
+                  <input class="form-input" type="date" x-model="form.lahir">
+                </div>
+                <div class="form-group"><label class="form-label">Kelasis <span
+                      style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.kelasis" @change="formError=''"
+                    :style="formError&&!form.kelasis?'border-color:var(--rose)':''">
+                    <option value="">— Pilih Kelasis —</option>
+                    <option>Tigi</option>
+                    <option>Tigi Barat</option>
+                    <option>Yatamo</option>
+                    <option>Wagamo</option>
+                    <option>Tigi Utara</option>
+                    <option>Debey</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Gereja</label>
+                  <input class="form-input" type="text" x-model="form.gereja" placeholder="Nama gereja">
+                </div>
+                <div class="form-group"><label class="form-label">Status</label>
+                  <select class="form-select" x-model="form.status">
+                    <option>Aktif</option>
+                    <option>Pindah</option>
+                    <option>Meninggal</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Nomor HP</label>
+                  <input class="form-input" type="text" x-model="form.hp" placeholder="+62 XXX-XXXX-XXXX">
+                </div>
+                <div class="form-group form-full"><label class="form-label">Alamat</label>
+                  <textarea class="form-textarea" x-model="form.alamat" placeholder="Alamat tempat tinggal"></textarea>
+                </div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()"
+                x-text="editMode?'💾 Simpan Perubahan':'＋ Tambah Jemaat'"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal View -->
+        <div class="modal-backdrop" x-show="viewModal" x-cloak @click.self="viewModal=false">
+          <div class="modal-box" x-show="viewItem">
+            <div class="modal-head">
+              <div>
+                <div class="modal-head-title" x-text="viewItem?.nama"></div>
+                <div style="font-size:11px;color:var(--text3)" x-text="viewItem?.id"></div>
+              </div>
+              <button class="modal-close" @click="viewModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div style="display:flex;flex-direction:column;gap:0">
+                <div class="detail-row"
+                  style="padding:9px 0;border-bottom:1px solid var(--border);display:flex;gap:14px;font-size:13px">
+                  <span
+                    style="width:120px;flex-shrink:0;color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px">ID</span>
+                  <span class="td-mono" x-text="viewItem?.id"></span>
+                </div>
+                <template
+                  x-for="[k,v] in Object.entries({Nama:viewItem?.nama,'Jenis Kelamin':viewItem?.jk==='L'?'Laki-laki':'Perempuan',Lahir:viewItem?.lahir,Gereja:viewItem?.gereja,Kelasis:viewItem?.kelasis,HP:viewItem?.hp,Status:viewItem?.status,Alamat:viewItem?.alamat})"
+                  :key="k">
+                  <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px">
+                    <span
+                      style="width:120px;flex-shrink:0;color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px"
+                      x-text="k"></span>
+                    <span style="color:var(--text)" x-text="v||'—'"></span>
+                  </div>
+                </template>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="viewModal=false">Tutup</button>
+              <button class="btn btn-primary" @click="viewModal=false;openEdit(viewItem)">✏️ Edit</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('jemaat', 'Manajemen Jemaat', 'Jemaat');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

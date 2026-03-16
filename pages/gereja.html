@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Gereja</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+
+    .form-error {
+      background: rgba(221, 85, 102, 0.1);
+      border: 1px solid rgba(221, 85, 102, 0.25);
+      border-radius: var(--r-sm);
+      padding: 8px 12px;
+      font-size: 12px;
+      color: var(--rose);
+      margin-bottom: 12px;
+    }
+
+    .detail-row {
+      display: flex;
+      gap: 16px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--border);
+      font-size: 13px;
+    }
+
+    .detail-row:last-child {
+      border-bottom: none;
+    }
+
+    .detail-key {
+      width: 130px;
+      flex-shrink: 0;
+      color: var(--text3);
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      padding-top: 2px;
+    }
+
+    .detail-val {
+      color: var(--text);
+      flex: 1;
+    }
+
+    .modal-box.wide {
+      width: 620px;
+    }
+
+    .view-stats {
+      display: flex;
+      gap: 16px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      padding: 14px 18px;
+      margin-bottom: 18px;
+    }
+
+    .vs-item {
+      text-align: center;
+      flex: 1;
+    }
+
+    .vs-val {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 22px;
+      font-weight: 600;
+      color: var(--text);
+      display: block;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .vs-lbl {
+      font-size: 10.5px;
+      color: var(--text3);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    tr.row-editing {
+      background: var(--gold-dim) !important;
+    }
+  </style>
+</head>
+
+<body x-data="layout('gereja')">
+
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+
+  <div class="app-layout">
+    <!-- SIDEBAR -->
+
+
+    <!-- MAIN -->
+    <div class="main-area">
+
+
+      <!-- PAGE CONTENT -->
+      <main class="page-content" x-data="gerejaPage">
+
+        <!-- Header -->
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Manajemen Gereja</h2>
+            <p x-text="allItems.length + ' gereja terdaftar di seluruh kelasis'"></p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline">&#11015; Export</button>
+            <button class="btn btn-primary" @click="openAdd()">&#xff0b; Tambah Gereja</button>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="toolbar">
+          <select class="f-select" x-model="filterKelasis" @change="resetPage()">
+            <option value="">Semua Kelasis</option>
+            <option>Tigi</option>
+            <option>Tigi Barat</option>
+            <option>Yatamo</option>
+            <option>Wagamo</option>
+            <option>Tigi Utara</option>
+            <option>Debey</option>
+          </select>
+          <select class="f-select" x-model="filterStatus" @change="resetPage()">
+            <option value="">Semua Status</option>
+            <option>Aktif</option>
+            <option>Nonaktif</option>
+          </select>
+          <input class="f-input" type="text" placeholder="Cari nama gereja atau gembala..." x-model="search"
+            @input="resetPage()" style="width:250px">
+          <button class="btn btn-ghost btn-sm" x-show="filterKelasis || filterStatus || search"
+            @click="filterKelasis=''; filterStatus=''; search=''; resetPage()">
+            x Reset Filter
+          </button>
+        </div>
+
+        <!-- Table Card -->
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size:13px;font-weight:600;color:var(--text)"
+              x-text="filtered.length + ' gereja ditemukan'"></div>
+            <div style="font-size:11.5px;color:var(--text3)" x-text="'Halaman ' + currentPage + ' dari ' + totalPages">
+            </div>
+          </div>
+
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Nama Gereja</th>
+                  <th>Kelasis</th>
+                  <th>Gembala</th>
+                  <th>Berdiri</th>
+                  <th>Jemaat</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+
+                <!-- Empty state -->
+                <template x-if="filtered.length === 0">
+                  <tr>
+                    <td colspan="8" style="text-align:center;padding:44px;color:var(--text3)">
+                      <div style="font-size:36px;opacity:0.25;margin-bottom:10px">&#9962;</div>
+                      <div style="font-size:14px;color:var(--text2);margin-bottom:4px">Tidak ada gereja ditemukan</div>
+                      <div style="font-size:12px">Coba ubah filter atau kata kunci pencarian</div>
+                    </td>
+                  </tr>
+                </template>
+
+                <!-- Data rows -->
+                <template x-for="g in paginated" :key="g.id">
+                  <tr :class="{ 'row-editing': editMode && showModal && form.id === g.id }">
+                    <td class="td-mono" x-text="g.id"></td>
+                    <td class="td-primary" x-text="g.nama"></td>
+                    <td><span class="badge" :class="g.kelasisBadge" x-text="g.kelasis"></span></td>
+                    <td x-text="g.gembala || '—'"></td>
+                    <td x-text="g.tahun || '—'"></td>
+                    <td x-text="g.jemaat || 0"></td>
+                    <td><span class="badge" :class="g.status==='Aktif'?'badge-teal':'badge-rose'"
+                        x-text="g.status"></span></td>
+                    <td>
+                      <div style="display:flex;gap:5px">
+                        <button class="act-btn act-view" title="Lihat Detail" @click="openView(g)">&#128065;</button>
+                        <button class="act-btn act-edit" title="Edit Data" @click="openEdit(g)">&#9999;&#65039;</button>
+                        <button class="act-btn act-delete" title="Hapus" @click="remove(g)">&#128465;</button>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination">
+            <span x-text="'Menampilkan ' + paginated.length + ' dari ' + filtered.length + ' gereja'"></span>
+            <div class="page-btns">
+              <div class="page-btn" @click="currentPage > 1 && currentPage--">&#8249;</div>
+              <template x-for="p in pageNumbers" :key="p">
+                <div class="page-btn" :class="{on: p===currentPage}" @click="currentPage=p" x-text="p"></div>
+              </template>
+              <div class="page-btn" @click="currentPage < totalPages && currentPage++">&#8250;</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================
+             MODAL: TAMBAH / EDIT
+        =================================================== -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+
+            <div class="modal-head">
+              <div class="modal-head-title"
+                x-text="editMode ? '&#9999;&#65039; Edit Data Gereja' : '&#xff0b; Tambah Gereja Baru'"></div>
+              <button class="modal-close" @click="showModal=false">&#10005;</button>
+            </div>
+
+            <div class="modal-body">
+
+              <!-- Validation error -->
+              <div class="form-error" x-show="formError" x-cloak x-text="formError"></div>
+
+              <div class="form-grid">
+
+                <div class="form-group form-full">
+                  <label class="form-label">Nama Gereja <span style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="text" x-model="form.nama" placeholder="Contoh: GKE Tigi Pusat"
+                    @input="formError=''" :style="formError && !form.nama ? 'border-color:var(--rose)' : ''">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Kelasis <span style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.kelasis" @change="formError=''"
+                    :style="formError && !form.kelasis ? 'border-color:var(--rose)' : ''">
+                    <option value="">&#8212; Pilih Kelasis &#8212;</option>
+                    <option>Tigi</option>
+                    <option>Tigi Barat</option>
+                    <option>Yatamo</option>
+                    <option>Wagamo</option>
+                    <option>Tigi Utara</option>
+                    <option>Debey</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" x-model="form.status">
+                    <option>Aktif</option>
+                    <option>Nonaktif</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Nama Gembala</label>
+                  <input class="form-input" type="text" x-model="form.gembala" placeholder="Nama pendeta / gembala">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Tahun Berdiri</label>
+                  <input class="form-input" type="number" x-model="form.tahun" placeholder="1990" min="1900" max="2099">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label">Jumlah Jemaat</label>
+                  <input class="form-input" type="number" x-model="form.jemaat" placeholder="0" min="0">
+                </div>
+
+                <div class="form-group form-full">
+                  <label class="form-label">Alamat Gereja</label>
+                  <textarea class="form-textarea" x-model="form.alamat"
+                    placeholder="Alamat lengkap gereja..."></textarea>
+                </div>
+
+                <div class="form-group form-full">
+                  <label class="form-label">Foto Gereja <span
+                      style="font-size:10.5px;color:var(--text3);font-weight:400">(opsional)</span></label>
+                  <input class="form-input" type="file" accept="image/*">
+                </div>
+
+              </div>
+            </div>
+
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()"
+                x-text="editMode ? '&#128190; Simpan Perubahan' : '&#xff0b; Tambah Gereja'">
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===================================================
+             MODAL: VIEW / DETAIL
+        =================================================== -->
+        <div class="modal-backdrop" x-show="viewModal" x-cloak @click.self="viewModal=false">
+          <div class="modal-box wide" x-show="viewItem">
+
+            <div class="modal-head">
+              <div>
+                <div class="modal-head-title" x-text="viewItem?.nama"></div>
+                <div style="font-size:11px;color:var(--text3);margin-top:2px" x-text="viewItem?.id"></div>
+              </div>
+              <button class="modal-close" @click="viewModal=false">&#10005;</button>
+            </div>
+
+            <div class="modal-body">
+              <!-- Quick stats -->
+              <div class="view-stats">
+                <div class="vs-item">
+                  <span class="vs-val" x-text="viewItem?.jemaat || 0"></span>
+                  <span class="vs-lbl">Jemaat</span>
+                </div>
+                <div class="vs-item">
+                  <span class="vs-val" x-text="viewItem?.tahun || '&mdash;'"></span>
+                  <span class="vs-lbl">Berdiri</span>
+                </div>
+                <div class="vs-item">
+                  <span class="vs-val" :style="viewItem?.status==='Aktif'?'color:var(--teal)':'color:var(--rose)'"
+                    x-text="viewItem?.status || '&mdash;'">
+                  </span>
+                  <span class="vs-lbl">Status</span>
+                </div>
+              </div>
+
+              <!-- Detail -->
+              <div class="detail-row"><span class="detail-key">ID</span><span class="detail-val td-mono"
+                  x-text="viewItem?.id"></span></div>
+              <div class="detail-row"><span class="detail-key">Nama Gereja</span><span class="detail-val"
+                  style="font-weight:600" x-text="viewItem?.nama"></span></div>
+              <div class="detail-row"><span class="detail-key">Kelasis</span>
+                <span class="detail-val"><span class="badge" :class="viewItem?.kelasisBadge"
+                    x-text="viewItem?.kelasis"></span></span>
+              </div>
+              <div class="detail-row"><span class="detail-key">Gembala</span><span class="detail-val"
+                  x-text="viewItem?.gembala || '&mdash;'"></span></div>
+              <div class="detail-row"><span class="detail-key">Tahun Berdiri</span><span class="detail-val"
+                  x-text="viewItem?.tahun || '&mdash;'"></span></div>
+              <div class="detail-row"><span class="detail-key">Jumlah Jemaat</span><span class="detail-val"
+                  x-text="viewItem?.jemaat || 0"></span></div>
+              <div class="detail-row"><span class="detail-key">Alamat</span><span class="detail-val"
+                  x-text="viewItem?.alamat || '&mdash;'"></span></div>
+              <div class="detail-row"><span class="detail-key">Status</span>
+                <span class="detail-val">
+                  <span class="badge" :class="viewItem?.status==='Aktif'?'badge-teal':'badge-rose'"
+                    x-text="viewItem?.status"></span>
+                </span>
+              </div>
+            </div>
+
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="viewModal=false">Tutup</button>
+              <button class="btn btn-primary" @click="viewModal=false; openEdit(viewItem)">&#9999;&#65039; Edit Gereja
+                Ini</button>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('gereja', 'Manajemen Gereja', 'Gereja');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

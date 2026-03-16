@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Pengguna</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('users')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="usersPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Manajemen Pengguna</h2>
+            <p x-text="items.length+' akun terdaftar'"></p>
+          </div>
+          <div class="page-actions"><button class="btn btn-primary" @click="openAdd()">＋ Tambah User</button></div>
+        </div>
+        <div class="card">
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>No</th>
+                  <th>Nama</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Kelasis / Gereja</th>
+                  <th>Status</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-for="(u,i) in items" :key="u.email">
+                  <tr>
+                    <td class="td-mono" x-text="String(i+1).padStart(2,'0')"></td>
+                    <td class="td-primary" x-text="u.nama"></td>
+                    <td style="font-size:12px;color:var(--text2)" x-text="u.email"></td>
+                    <td><span :class="roleBadge(u.role)" x-text="u.role"></span></td>
+                    <td x-text="u.kelasis||'—'"></td>
+                    <td><span class="badge" :class="u.status==='Aktif'?'badge-teal':'badge-rose'"
+                        x-text="u.status"></span></td>
+                    <td>
+                      <div style="display:flex;gap:5px">
+                        <button class="act-btn act-edit" title="Edit" @click="openEdit(u)">✏️</button>
+                        <button class="act-btn" title="Reset Password"
+                          style="background:rgba(138,108,240,.13);color:var(--violet)" @click="resetPwd(u)">🔑</button>
+                        <button class="act-btn" title="Ubah Status"
+                          :style="u.status==='Aktif'?'background:rgba(221,85,102,.13);color:var(--rose)':'background:rgba(22,184,154,.13);color:var(--teal)'"
+                          @click="toggleStatus(u)" x-text="u.status==='Aktif'?'⏸':'▶'"></button>
+                        <button class="act-btn act-delete" title="Hapus" @click="remove(u)">🗑</button>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Modal -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="editMode?'✏️ Edit Pengguna':'＋ Tambah User Baru'"></div>
+              <button class="modal-close" @click="showModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-error" x-show="formError" x-cloak x-text="formError" style="margin-bottom:12px"></div>
+              <div class="form-grid">
+                <div class="form-group form-full"><label class="form-label">Nama Lengkap <span
+                      style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="text" x-model="form.nama" placeholder="Nama pengguna"
+                    @input="formError=''">
+                </div>
+                <div class="form-group"><label class="form-label">Email <span style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="email" x-model="form.email" placeholder="user@deiyai.id"
+                    @input="formError=''" :readonly="editMode">
+                </div>
+                <div class="form-group" x-show="!editMode"><label class="form-label">Password <span
+                      style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="password" x-model="form.password" placeholder="Min. 8 karakter">
+                </div>
+                <div class="form-group"><label class="form-label">Role <span style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.role">
+                    <option>Super Admin</option>
+                    <option>Admin Kelasis</option>
+                    <option>Operator Gereja</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Kelasis / Gereja</label>
+                  <select class="form-select" x-model="form.kelasis">
+                    <option value="">— Pilih —</option>
+                    <option>Kelasis Tigi</option>
+                    <option>Tigi Barat</option>
+                    <option>Yatamo</option>
+                    <option>Wagamo</option>
+                    <option>Tigi Utara</option>
+                    <option>Debey</option>
+                    <option>GKE Tigi Pusat</option>
+                    <option>GKI Tigi Barat</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Status</label>
+                  <select class="form-select" x-model="form.status">
+                    <option>Aktif</option>
+                    <option>Nonaktif</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()" x-text="editMode?'💾 Simpan':'＋ Buat Akun'"></button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    // Guard: halaman ini hanya untuk Super Admin
+    (function () {
+      try {
+        var u = JSON.parse(localStorage.getItem('simgk_user') || 'null');
+        if (!u || u.role !== 'Super Admin') {
+          window.location.href = 'dashboard.html';
+        }
+      } catch (e) { window.location.href = 'dashboard.html'; }
+    })();
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('users', 'Manajemen Pengguna', 'Pengguna');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>

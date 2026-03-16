@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Kegiatan</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important
+    }
+  </style>
+</head>
+
+<body x-data="layout('kegiatan')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="kegiatanPage">
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Monitoring Kegiatan</h2>
+            <p x-text="allItems.length+' kegiatan tercatat tahun 2024'"></p>
+          </div>
+          <div class="page-actions"><button class="btn btn-primary" @click="openAdd()">＋ Tambah Kegiatan</button></div>
+        </div>
+        <div class="toolbar">
+          <select class="f-select" x-model="filterJenis" @change="resetPage()">
+            <option value="">Semua Jenis</option>
+            <template x-for="j in jenisOptions" :key="j">
+              <option :value="j" x-text="j"></option>
+            </template>
+          </select>
+          <select class="f-select" x-model="filterKelasis" @change="resetPage()">
+            <option value="">Semua Kelasis</option>
+            <option>Tigi</option>
+            <option>Tigi Barat</option>
+            <option>Yatamo</option>
+            <option>Wagamo</option>
+            <option>Tigi Utara</option>
+            <option>Debey</option>
+          </select>
+          <input class="f-input" type="text" placeholder="Cari kegiatan..." x-model="search" @input="resetPage()"
+            style="width:200px">
+          <button class="btn btn-ghost btn-sm" x-show="filterJenis||filterKelasis||search"
+            @click="filterJenis='';filterKelasis='';search='';resetPage()">✕ Reset</button>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div style="font-size:13px;font-weight:600;color:var(--text)"
+              x-text="filtered.length+' kegiatan ditemukan'"></div>
+            <div style="font-size:11.5px;color:var(--text3)" x-text="'Hal '+currentPage+' dari '+totalPages"></div>
+          </div>
+          <div class="table-wrap">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Nama Kegiatan</th>
+                  <th>Gereja</th>
+                  <th>Kelasis</th>
+                  <th>Tanggal</th>
+                  <th>Peserta</th>
+                  <th>Jenis</th>
+                  <th>Aksi</th>
+                </tr>
+              </thead>
+              <tbody>
+                <template x-if="filtered.length===0">
+                  <tr>
+                    <td colspan="7" style="text-align:center;padding:40px;color:var(--text3)">
+                      <div style="font-size:32px;opacity:.25;margin-bottom:8px">📅</div>
+                      <div style="color:var(--text2)">Tidak ada kegiatan ditemukan</div>
+                    </td>
+                  </tr>
+                </template>
+                <template x-for="k in paginated" :key="k.nama+k.tanggal">
+                  <tr>
+                    <td class="td-primary" x-text="k.nama"></td>
+                    <td x-text="k.gereja||'—'"></td>
+                    <td><span class="badge" :class="k.kelasisBadge" x-text="k.kelasis"></span></td>
+                    <td x-text="k.tanggal||'—'"></td>
+                    <td x-text="k.peserta||0"></td>
+                    <td><span class="badge" :class="k.jenisBadge" x-text="k.jenis"></span></td>
+                    <td>
+                      <div style="display:flex;gap:5px">
+                        <button class="act-btn act-view" title="Detail" @click="openView(k)">👁</button>
+                        <button class="act-btn act-edit" title="Edit" @click="openEdit(k)">✏️</button>
+                        <button class="act-btn act-delete" title="Hapus" @click="remove(k)">🗑</button>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
+              </tbody>
+            </table>
+          </div>
+          <div class="pagination">
+            <span x-text="'Menampilkan '+paginated.length+' dari '+filtered.length+' kegiatan'"></span>
+            <div class="page-btns">
+              <div class="page-btn" @click="currentPage>1&&currentPage--">‹</div>
+              <template x-for="p in pageNumbers" :key="p">
+                <div class="page-btn" :class="{on:p===currentPage}" @click="currentPage=p" x-text="p"></div>
+              </template>
+              <div class="page-btn" @click="currentPage<totalPages&&currentPage++">›</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Tambah/Edit -->
+        <div class="modal-backdrop" x-show="showModal" x-cloak @click.self="showModal=false">
+          <div class="modal-box">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="editMode?'✏️ Edit Kegiatan':'＋ Tambah Kegiatan'"></div>
+              <button class="modal-close" @click="showModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div class="form-error" x-show="formError" x-cloak x-text="formError" style="margin-bottom:12px"></div>
+              <div class="form-grid">
+                <div class="form-group form-full"><label class="form-label">Nama Kegiatan <span
+                      style="color:var(--rose)">*</span></label>
+                  <input class="form-input" type="text" x-model="form.nama" placeholder="Contoh: Ibadah Minggu Pagi"
+                    @input="formError=''">
+                </div>
+                <div class="form-group"><label class="form-label">Jenis Kegiatan <span
+                      style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.jenis">
+                    <template x-for="j in jenisOptions" :key="j">
+                      <option :value="j" x-text="j"></option>
+                    </template>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Tanggal</label>
+                  <input class="form-input" type="date" x-model="form.tanggal">
+                </div>
+                <div class="form-group"><label class="form-label">Kelasis <span
+                      style="color:var(--rose)">*</span></label>
+                  <select class="form-select" x-model="form.kelasis" @change="formError=''"
+                    :style="formError&&!form.kelasis?'border-color:var(--rose)':''">
+                    <option value="">— Pilih Kelasis —</option>
+                    <option>Tigi</option>
+                    <option>Tigi Barat</option>
+                    <option>Yatamo</option>
+                    <option>Wagamo</option>
+                    <option>Tigi Utara</option>
+                    <option>Debey</option>
+                  </select>
+                </div>
+                <div class="form-group"><label class="form-label">Gereja</label>
+                  <input class="form-input" type="text" x-model="form.gereja" placeholder="Nama gereja">
+                </div>
+                <div class="form-group"><label class="form-label">Jumlah Peserta</label>
+                  <input class="form-input" type="number" x-model="form.peserta" placeholder="0" min="0">
+                </div>
+                <div class="form-group form-full"><label class="form-label">Deskripsi</label>
+                  <textarea class="form-textarea" x-model="form.deskripsi"
+                    placeholder="Keterangan kegiatan..."></textarea>
+                </div>
+                <div class="form-group form-full"><label class="form-label">Foto Kegiatan <span
+                      style="font-size:10.5px;color:var(--text3)">(opsional)</span></label>
+                  <input class="form-input" type="file" accept="image/*" multiple>
+                </div>
+              </div>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="showModal=false">Batal</button>
+              <button class="btn btn-primary" @click="save()" x-text="editMode?'💾 Simpan':'＋ Tambah'"></button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal View -->
+        <div class="modal-backdrop" x-show="viewModal" x-cloak @click.self="viewModal=false">
+          <div class="modal-box" x-show="viewItem">
+            <div class="modal-head">
+              <div class="modal-head-title" x-text="viewItem?.nama"></div>
+              <button class="modal-close" @click="viewModal=false">✕</button>
+            </div>
+            <div class="modal-body">
+              <div
+                style="display:flex;gap:16px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r-sm);padding:14px 18px;margin-bottom:16px">
+                <div style="text-align:center;flex:1"><span
+                    style="font-family:'JetBrains Mono',monospace;font-size:22px;font-weight:600;color:var(--text);display:block"
+                    x-text="viewItem?.peserta||0"></span><span
+                    style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Peserta</span>
+                </div>
+                <div style="text-align:center;flex:1"><span
+                    style="font-size:14px;font-weight:500;color:var(--text);display:block"
+                    x-text="viewItem?.tanggal||'—'"></span><span
+                    style="font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.8px">Tanggal</span>
+                </div>
+              </div>
+              <template
+                x-for="[k,v] in Object.entries({Kegiatan:viewItem?.nama,Jenis:viewItem?.jenis,Gereja:viewItem?.gereja,Kelasis:viewItem?.kelasis,Tanggal:viewItem?.tanggal,Peserta:viewItem?.peserta,Deskripsi:viewItem?.deskripsi})"
+                :key="k">
+                <div style="display:flex;gap:14px;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px">
+                  <span
+                    style="width:110px;flex-shrink:0;color:var(--text3);font-size:11px;text-transform:uppercase;letter-spacing:.5px"
+                    x-text="k"></span>
+                  <span style="color:var(--text)" x-text="v||'—'"></span>
+                </div>
+              </template>
+            </div>
+            <div class="modal-foot">
+              <button class="btn btn-outline" @click="viewModal=false">Tutup</button>
+              <button class="btn btn-primary" @click="viewModal=false;openEdit(viewItem)">✏️ Edit</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+
+
+
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('kegiatan', 'Monitoring Kegiatan', 'Kegiatan');
+    });
+    function checkResp() { const b = document.getElementById('menuBtn'); if (b) b.style.display = window.innerWidth <= 900 ? 'flex' : 'none'; }
+    window.addEventListener('resize', checkResp); checkResp();
+  </script>
+</body>
+
+</html>
