@@ -59,6 +59,45 @@
       transform: rotate(15deg);
     }
 
+    /* ── Tombol kembali ke landing — fixed di pojok kiri atas ── */
+    .btn-back-landing {
+      position: fixed;
+      top: 18px;
+      left: 20px;
+      z-index: 10;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: rgba(13, 24, 40, 0.85);
+      border: 1px solid var(--border2);
+      border-radius: 99px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text2);
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-back-landing:hover {
+      border-color: var(--gold);
+      color: var(--gold2);
+      background: rgba(13, 24, 40, 0.95);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transform: translateX(-2px);
+    }
+
+    .btn-back-landing .arrow {
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+
+    .btn-back-landing:hover .arrow {
+      transform: translateX(-3px);
+    }
+
     .login-card {
       background: var(--bg2);
       border: 1px solid var(--border2);
@@ -279,7 +318,7 @@
       margin-bottom: 7px;
     }
 
-    /* ── Demo Accounts Box ── */
+    /* Demo Accounts */
     .demo-box {
       margin-top: 18px;
       border: 1px solid var(--border);
@@ -383,22 +422,48 @@
       flex-shrink: 0;
     }
 
+    /* Footer + link landing di bawah card */
     .login-footer {
       text-align: center;
       margin-top: 18px;
       font-size: 10.5px;
       color: var(--text4);
     }
+
+    .login-footer a {
+      color: var(--text3);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+
+    .login-footer a:hover {
+      color: var(--gold2);
+    }
+
+    /* Mobile: tombol back lebih kompak */
+    @media (max-width: 480px) {
+      .btn-back-landing {
+        top: 12px;
+        left: 12px;
+        padding: 6px 12px;
+        font-size: 11.5px;
+      }
+
+      .login-card {
+        padding: 32px 22px;
+      }
+    }
   </style>
 </head>
 
 <body>
-  <!--
-    URUTAN SCRIPT WAJIB:
-    1. sweetalert2.js  (sync) — Swal tersedia sebelum app.js butuh
-    2. app.js          (sync) — daftarkan Alpine.data('loginPage') SEBELUM Alpine scan
-    3. alpinejs        (defer)— mount TERAKHIR, loginPage sudah terdaftar
-  -->
+
+  <!-- ── Tombol kembali ke landing page ── -->
+  <a href="landing.html" class="btn-back-landing">
+    <span class="arrow">←</span>
+    Beranda
+  </a>
+
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
   <script src="assets/js/app.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -429,11 +494,13 @@
         </template>
       </div>
 
-      <!-- Form -->
+      <!-- Email -->
       <div class="inp-wrap">
         <span class="inp-ico">✉️</span>
         <input type="email" placeholder="Email / Username" x-model="email" @keyup.enter="doLogin">
       </div>
+
+      <!-- Password -->
       <div class="inp-wrap">
         <span class="inp-ico">🔒</span>
         <input type="password" placeholder="Password" x-model="password" @keyup.enter="doLogin">
@@ -450,7 +517,7 @@
         <template x-if="!loading"><span>Masuk ke Sistem →</span></template>
       </button>
 
-      <!-- ── Demo Accounts ── -->
+      <!-- Demo Accounts -->
       <div class="demo-box">
         <div class="demo-head" @click="showDemo = !showDemo">
           <span class="demo-head-label">🔑 Akun Demo</span>
@@ -469,10 +536,12 @@
           </template>
         </div>
       </div>
-      <!-- /Demo Accounts -->
 
+      <!-- Footer -->
       <div class="login-footer">
-        ©Devp_Rick11 &nbsp;|&nbsp; 2024 SIMGK — Gereja Koordinator Deiyai · Papua Tengah
+        <a href="landing.html">← Kembali ke Beranda</a>
+        &nbsp;·&nbsp;
+        ©Devp_Rick11 &nbsp;|&nbsp; 2024 SIMGK Deiyai
       </div>
     </div>
   </div>
