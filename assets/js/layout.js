@@ -87,7 +87,7 @@ function _getUser() {
 function _doLogout() {
   localStorage.removeItem('simgk_user');
   var inPages = window.location.pathname.indexOf('/pages/') >= 0;
-  window.location.href = inPages ? '../index.html' : 'index.html';
+  window.location.href = inPages ? '../login.html' : 'login.html';
 }
 
 function _checkResponsive() {
@@ -272,7 +272,7 @@ function buildLayout(activePage, pageTitle, pageCrumb) {
   var role = getCurrentRole();
   if (!role) {
     var inPages = window.location.pathname.indexOf('/pages/') >= 0;
-    window.location.href = inPages ? '../index.html' : 'index.html';
+    window.location.href = inPages ? '../login.html' : 'login.html';
     return;
   }
 

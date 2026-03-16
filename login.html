@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Login</title>
+  <link rel="stylesheet" href="assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-page::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 70% 55% at 18% 38%, rgba(200, 160, 32, 0.07) 0%, transparent 65%),
+        radial-gradient(ellipse 55% 65% at 82% 65%, rgba(52, 120, 213, 0.05) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .login-grid {
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(31, 46, 68, 0.4) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(31, 46, 68, 0.4) 1px, transparent 1px);
+      background-size: 44px 44px;
+      opacity: 0.35;
+    }
+
+    .cross-deco {
+      position: absolute;
+      font-size: 140px;
+      color: rgba(200, 160, 32, 0.03);
+      font-weight: 900;
+      user-select: none;
+      pointer-events: none;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .cross-deco.one {
+      top: -40px;
+      left: -30px;
+    }
+
+    .cross-deco.two {
+      bottom: -40px;
+      right: -20px;
+      transform: rotate(15deg);
+    }
+
+    /* ── Tombol kembali ke landing — fixed di pojok kiri atas ── */
+    .btn-back-landing {
+      position: fixed;
+      top: 18px;
+      left: 20px;
+      z-index: 10;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      padding: 8px 16px;
+      background: rgba(13, 24, 40, 0.85);
+      border: 1px solid var(--border2);
+      border-radius: 99px;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text2);
+      text-decoration: none;
+      backdrop-filter: blur(12px);
+      transition: all 0.2s ease;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .btn-back-landing:hover {
+      border-color: var(--gold);
+      color: var(--gold2);
+      background: rgba(13, 24, 40, 0.95);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      transform: translateX(-2px);
+    }
+
+    .btn-back-landing .arrow {
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+
+    .btn-back-landing:hover .arrow {
+      transform: translateX(-3px);
+    }
+
+    .login-card {
+      background: var(--bg2);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-xl);
+      padding: 42px 38px;
+      width: 460px;
+      max-width: 100%;
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--shadow-lg), var(--glow-gold);
+    }
+
+    .login-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 20%;
+      right: 20%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      border-radius: 99px;
+    }
+
+    .login-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-bottom: 28px;
+    }
+
+    .login-mark {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(140deg, var(--gold2), #8a6a0a);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      margin-bottom: 14px;
+      box-shadow: 0 8px 30px rgba(200, 160, 32, 0.45);
+      animation: markPulse 3s ease-in-out infinite;
+    }
+
+    @keyframes markPulse {
+
+      0%,
+      100% {
+        box-shadow: 0 8px 30px rgba(200, 160, 32, 0.45);
+      }
+
+      50% {
+        box-shadow: 0 8px 50px rgba(200, 160, 32, 0.65);
+      }
+    }
+
+    .login-logo h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--gold2);
+      letter-spacing: 0.4px;
+      text-align: center;
+    }
+
+    .login-logo p {
+      font-size: 11px;
+      color: var(--text3);
+      text-align: center;
+      margin-top: 5px;
+      letter-spacing: 1.4px;
+      text-transform: uppercase;
+      line-height: 1.5;
+    }
+
+    .login-divider {
+      height: 1px;
+      background: var(--border);
+      margin-bottom: 22px;
+    }
+
+    .role-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+
+    .role-opt {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 5px;
+      padding: 10px 8px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border2);
+      cursor: pointer;
+      transition: all var(--t);
+      font-size: 11px;
+      font-weight: 500;
+      color: var(--text3);
+      background: var(--surface);
+      user-select: none;
+    }
+
+    .role-opt .ico {
+      font-size: 22px;
+    }
+
+    .role-opt:hover {
+      border-color: var(--border3);
+      color: var(--text2);
+    }
+
+    .role-opt.active {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+      color: var(--gold2);
+      box-shadow: 0 0 16px rgba(200, 160, 32, 0.12);
+    }
+
+    .inp-wrap {
+      position: relative;
+      margin-bottom: 14px;
+    }
+
+    .inp-ico {
+      position: absolute;
+      left: 13px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 15px;
+      color: var(--text3);
+      pointer-events: none;
+    }
+
+    .inp-wrap input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-sm);
+      padding: 11px 11px 11px 40px;
+      font-size: 13.5px;
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      outline: none;
+      transition: all var(--t);
+    }
+
+    .inp-wrap input:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px var(--gold-dim);
+    }
+
+    .inp-wrap input::placeholder {
+      color: var(--text3);
+    }
+
+    .login-error {
+      background: rgba(221, 85, 102, 0.12);
+      border: 1px solid rgba(221, 85, 102, 0.25);
+      border-radius: var(--r-sm);
+      padding: 9px 12px;
+      font-size: 12.5px;
+      color: var(--rose);
+      margin-bottom: 14px;
+    }
+
+    .btn-login {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, var(--gold2), #9a7a0a);
+      border: none;
+      border-radius: var(--r-sm);
+      font-size: 14px;
+      font-weight: 600;
+      color: #08111e;
+      font-family: 'DM Sans', sans-serif;
+      cursor: pointer;
+      transition: all 0.22s;
+      letter-spacing: 0.3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .btn-login:hover:not(:disabled) {
+      box-shadow: 0 6px 24px rgba(200, 160, 32, 0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-login:disabled {
+      opacity: 0.7;
+      cursor: wait;
+    }
+
+    .spin {
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(8, 17, 30, 0.3);
+      border-top-color: #08111e;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+    }
+
+    @keyframes spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    .form-label {
+      font-size: 11.5px;
+      font-weight: 500;
+      color: var(--text2);
+      display: block;
+      margin-bottom: 7px;
+    }
+
+    /* Demo Accounts */
+    .demo-box {
+      margin-top: 18px;
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      overflow: hidden;
+    }
+
+    .demo-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 14px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .demo-head-label {
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text3);
+    }
+
+    .demo-head-toggle {
+      font-size: 11px;
+      color: var(--gold);
+    }
+
+    .demo-list {
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .demo-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 11px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: var(--r-sm);
+      cursor: pointer;
+      transition: all var(--t);
+    }
+
+    .demo-item:hover {
+      border-color: var(--gold);
+      background: var(--gold-dim);
+    }
+
+    .demo-badge {
+      font-size: 9px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 99px;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .demo-badge.sa {
+      background: rgba(200, 160, 32, 0.18);
+      color: var(--gold2);
+    }
+
+    .demo-badge.ak {
+      background: rgba(52, 120, 213, 0.18);
+      color: var(--blue2);
+    }
+
+    .demo-badge.op {
+      background: rgba(138, 108, 240, 0.18);
+      color: var(--violet);
+    }
+
+    .demo-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .demo-email {
+      font-size: 12px;
+      color: var(--text);
+      font-weight: 500;
+    }
+
+    .demo-pass {
+      font-size: 10.5px;
+      color: var(--text3);
+      font-family: 'JetBrains Mono', monospace;
+      margin-top: 1px;
+    }
+
+    .demo-click {
+      font-size: 9.5px;
+      color: var(--gold);
+      flex-shrink: 0;
+    }
+
+    /* Footer + link landing di bawah card */
+    .login-footer {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 10.5px;
+      color: var(--text4);
+    }
+
+    .login-footer a {
+      color: var(--text3);
+      text-decoration: none;
+      transition: color 0.18s;
+    }
+
+    .login-footer a:hover {
+      color: var(--gold2);
+    }
+
+    /* Mobile: tombol back lebih kompak */
+    @media (max-width: 480px) {
+      .btn-back-landing {
+        top: 12px;
+        left: 12px;
+        padding: 6px 12px;
+        font-size: 11.5px;
+      }
+
+      .login-card {
+        padding: 32px 22px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- ── Tombol kembali ke landing page ── -->
+  <a href="index.html" class="btn-back-landing">
+    <span class="arrow">←</span>
+    Beranda
+  </a>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="assets/js/app.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+  <div class="login-page" x-data="loginPage">
+    <div class="login-grid"></div>
+    <div class="cross-deco one">✝</div>
+    <div class="cross-deco two">✝</div>
+
+    <div class="login-card">
+
+      <!-- Logo -->
+      <div class="login-logo">
+        <div class="login-mark">⛪</div>
+        <h1>Koordinator Deiyai</h1>
+        <p>Sistem Monitoring Gereja Koordinator Deiyai · Papua Tengah</p>
+      </div>
+      <div class="login-divider"></div>
+
+      <!-- Role selector -->
+      <label class="form-label">Masuk Sebagai</label>
+      <div class="role-grid">
+        <template x-for="r in roles" :key="r.id">
+          <div class="role-opt" :class="{ active: selectedRole === r.id }" @click="selectRole(r.id)">
+            <span class="ico" x-text="r.icon"></span>
+            <span x-text="r.label"></span>
+          </div>
+        </template>
+      </div>
+
+      <!-- Email -->
+      <div class="inp-wrap">
+        <span class="inp-ico">✉️</span>
+        <input type="email" placeholder="Email / Username" x-model="email" @keyup.enter="doLogin">
+      </div>
+
+      <!-- Password -->
+      <div class="inp-wrap">
+        <span class="inp-ico">🔒</span>
+        <input type="password" placeholder="Password" x-model="password" @keyup.enter="doLogin">
+      </div>
+
+      <!-- Error -->
+      <div class="login-error" x-show="error" x-text="error" style="display:none"></div>
+
+      <!-- Submit -->
+      <button class="btn-login" @click="doLogin" :disabled="loading">
+        <template x-if="loading">
+          <div class="spin"></div>
+        </template>
+        <template x-if="!loading"><span>Masuk ke Sistem →</span></template>
+      </button>
+
+      <!-- Demo Accounts -->
+      <div class="demo-box">
+        <div class="demo-head" @click="showDemo = !showDemo">
+          <span class="demo-head-label">🔑 Akun Demo</span>
+          <span class="demo-head-toggle" x-text="showDemo ? '▲ Sembunyikan' : '▼ Tampilkan'"></span>
+        </div>
+        <div class="demo-list" x-show="showDemo" x-transition style="display:none">
+          <template x-for="acc in demoAccounts" :key="acc.email">
+            <div class="demo-item" @click="fillDemo(acc)">
+              <span class="demo-badge" :class="acc.badgeClass" x-text="acc.badgeLabel"></span>
+              <div class="demo-info">
+                <div class="demo-email" x-text="acc.email"></div>
+                <div class="demo-pass" x-text="'Pass: ' + acc.password"></div>
+              </div>
+              <span class="demo-click">Klik →</span>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div class="login-footer">
+        <a href="index.html">← Kembali ke Beranda</a>
+        &nbsp;·&nbsp;
+        ©Devp_Rick11 &nbsp;|&nbsp; 2024 SIMGK Deiyai
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>

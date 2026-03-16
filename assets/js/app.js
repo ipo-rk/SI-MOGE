@@ -69,7 +69,7 @@ document.addEventListener('alpine:init', () => {
       this.isLoggedIn = false;
       localStorage.removeItem('simgk_user');
       const inPages = window.location.pathname.includes('/pages/');
-      window.location.href = inPages ? '../index.html' : 'index.html';
+      window.location.href = inPages ? '../login.html' : 'login.html';
     },
 
     restore() {
@@ -203,7 +203,7 @@ document.addEventListener('alpine:init', () => {
       /* Redirect ke login jika belum login */
       if (!Alpine.store('auth').restore()) {
         const inPages = window.location.pathname.includes('/pages/');
-        window.location.href = inPages ? '../index.html' : 'index.html';
+        window.location.href = inPages ? '../login.html' : 'login.html';
       }
     },
 
