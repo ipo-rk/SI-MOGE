@@ -34,9 +34,9 @@
  */
 
 var MENU_ACCESS = {
-  'Super Admin': ['dashboard', 'statistik', 'notifikasi', 'pengumuman', 'kelasis', 'gereja', 'jemaat', 'kegiatan', 'laporan', 'dokumen', 'export', 'users', 'actlog', 'pengaturan'],
-  'Admin Kelasis': ['dashboard', 'statistik', 'notifikasi', 'pengumuman', 'kelasis', 'gereja', 'jemaat', 'kegiatan', 'laporan', 'dokumen', 'export'],
-  'Operator Gereja': ['dashboard', 'notifikasi', 'pengumuman', 'gereja', 'jemaat', 'kegiatan', 'dokumen'],
+  'Super Admin': ['dashboard', 'statistik', 'notifikasi', 'pengumuman', 'kelasis', 'gereja', 'jemaat', 'kegiatan', 'laporan', 'dokumen', 'export', 'users', 'actlog', 'pengaturan', 'panduan'],
+  'Admin Kelasis': ['dashboard', 'statistik', 'notifikasi', 'pengumuman', 'kelasis', 'gereja', 'jemaat', 'kegiatan', 'laporan', 'dokumen', 'export', 'panduan'],
+  'Operator Gereja': ['dashboard', 'notifikasi', 'pengumuman', 'gereja', 'jemaat', 'kegiatan', 'dokumen', 'panduan'],
 };
 
 var NAV_SECTIONS = [
@@ -64,7 +64,8 @@ var NAV_SECTIONS = [
     ]
   },
   {
-    section: 'Sistem', items: [
+    section: 'Bantuan & Sistem', items: [
+      { id: 'panduan', icon: '&#128214;', label: 'Panduan', href: 'panduan.html' },
       { id: 'users', icon: '&#128100;', label: 'Pengguna', href: 'users.html' },
       { id: 'actlog', icon: '&#128220;', label: 'Activity Log', href: 'actlog.html' },
       { id: 'pengaturan', icon: '&#9881;', label: 'Pengaturan', href: 'pengaturan.html' },
@@ -138,7 +139,7 @@ function _createSidebar(activePage, role, user) {
 
   aside.innerHTML =
     '<a href="dashboard.html" class="sidebar-logo">'
-    + '<div class="logo-mark">&#9962;</div>'
+    + '<div class="logo-mark" style="background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;"><img src="../assets/img/logo.png" alt="Logo Sinode KINGMI Papua" style="width:34px;height:34px;object-fit:contain;"></div>'
     + '<div class="logo-text"><h1>Sistem Monitoring </h1><p>Koordinator Deiyai - Papua Tengah</p></div>'
     + '</a>'
     + '<nav class="sidebar-nav">' + navHTML + '</nav>'
@@ -183,7 +184,7 @@ function _createTopbar(pageTitle, crumb) {
   return header;
 }
 
-/* ── Event listeners: logout + hamburger ── */
+/* ── Event listeners: logout + hamburger + search ── */
 function _bindEvents() {
   function logout() {
     if (window.Swal) {
@@ -227,6 +228,19 @@ function _bindEvents() {
       overlay.classList.remove('open');
     });
   }
+
+  /* Topbar Search Integration */
+  var topbarSearch = document.querySelector('.topbar-search input');
+  if (topbarSearch) {
+    topbarSearch.addEventListener('input', function () {
+      var val = this.value;
+      var pageSearch = document.querySelector('input[x-model="search"]');
+      if (pageSearch) {
+        pageSearch.value = val;
+        pageSearch.dispatchEvent(new Event('input', { bubbles: true }));
+      }
+    });
+  }
 }
 
 /* ── Sinkronisasi notif badge setelah Alpine siap ── */
@@ -234,15 +248,14 @@ function _syncNotifBadge() {
   var attempts = 0;
   var timer = setInterval(function () {
     attempts++;
-    if (attempts > 40) { clearInterval(timer); return; }
+    if (attempts > 50) { clearInterval(timer); return; }
     try {
-      if (!window.Alpine) return;
+      if (!window.Alpine || !Alpine.store || !Alpine.store('notif')) return;
       var store = Alpine.store('notif');
-      if (!store) return;
       clearInterval(timer);
 
       function update() {
-        var count = store.items ? store.items.filter(function (n) { return !n.read; }).length : 0;
+        var count = store.unread !== undefined ? store.unread : (store.items ? store.items.filter(function (n) { return !n.read; }).length : 0);
         var badge = document.getElementById('simgk-notif-badge');
         var dot = document.getElementById('simgk-notif-dot');
         if (badge) { badge.textContent = count; badge.style.display = count > 0 ? '' : 'none'; }
@@ -250,12 +263,14 @@ function _syncNotifBadge() {
       }
 
       update();
-      Alpine.effect(function () {
-        if (store.items) { var _ = store.items.length; }
-        update();
-      });
+      if (Alpine.effect) {
+        Alpine.effect(function () {
+          var _ = store.unread;
+          update();
+        });
+      }
     } catch (e) { }
-  }, 300);
+  }, 200);
 }
 
 /* ══════════════════════════════════════════════════════════

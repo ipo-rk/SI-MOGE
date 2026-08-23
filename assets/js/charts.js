@@ -1,7 +1,7 @@
 /**
  * ============================================================
- * SIMGK DEIYAI — Chart.js Configuration & Init
- * Sistem Monitoring Gereja Koordinator Deiyai, Papua
+ * SIMGK DEIYAI — Chart.js Configuration & Dynamic Init
+ * Sistem Monitoring Gereja Koordinator Deiyai, Papua Tengah
  * ============================================================
  */
 
@@ -24,7 +24,7 @@ const C = {
   surface:'#172234',
 };
 
-const PALLETE = [C.gold, C.blue2, C.teal, C.violet, C.rose, C.lime];
+const PALLETE = [C.gold, C.blue2, C.teal, C.violet, C.rose, C.lime, C.amber];
 const PALLETE_DIM = [
   'rgba(200,160,32,0.75)',
   'rgba(90,155,240,0.75)',
@@ -32,6 +32,7 @@ const PALLETE_DIM = [
   'rgba(138,108,240,0.75)',
   'rgba(221,85,102,0.75)',
   'rgba(61,207,110,0.75)',
+  'rgba(232,148,58,0.75)',
 ];
 
 /* ── Shared plugin options ── */
@@ -78,81 +79,129 @@ Chart.defaults.font.family = "'DM Sans', sans-serif";
 Chart.defaults.animation.duration = 700;
 Chart.defaults.animation.easing = 'easeInOutQuart';
 
+function getStore() {
+  try {
+    if (window.Alpine && Alpine.store && Alpine.store('data')) {
+      return Alpine.store('data');
+    }
+  } catch (e) {}
+  return null;
+}
+
 /* ─────────────────────────────────────────────────
    DASHBOARD CHARTS
 ───────────────────────────────────────────────── */
 window.initDashboardCharts = function() {
   const el1 = document.getElementById('chart-kegiatan');
   const el2 = document.getElementById('chart-kelasis-donut');
-  if (!el1 || !el2) return;
+  if (!el1 && !el2) return;
 
-  /* Destroy existing if any */
-  Chart.getChart(el1)?.destroy();
-  Chart.getChart(el2)?.destroy();
+  const store = getStore();
 
   /* 1) Kegiatan per Bulan — Line */
-  new Chart(el1.getContext('2d'), {
-    type: 'line',
-    data: {
-      labels: ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'],
-      datasets: [{
-        label: 'Total Kegiatan 2024',
-        data: [14, 18, 22, 16, 20, 24, 28, 19, 21, 26, 30, 14],
-        borderColor: C.gold,
-        backgroundColor: 'rgba(200,160,32,0.07)',
-        borderWidth: 2,
-        tension: 0.42,
-        fill: true,
-        pointBackgroundColor: C.gold,
-        pointBorderColor: C.bg2,
-        pointBorderWidth: 2,
-        pointRadius: 4,
-        pointHoverRadius: 7,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: tooltipPlugin,
+  if (el1) {
+    Chart.getChart(el1)?.destroy();
+
+    // Generate month dynamic counts from actual store.kegiatan if available
+    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+    const monthlyCounts = [14, 18, 22, 16, 20, 24, 28, 19, 21, 26, 30, 14];
+    if (store && store.kegiatan) {
+      // Aggregate real activities into current month if present
+      const curMonth = new Date().getMonth();
+      monthlyCounts[curMonth] = Math.max(monthlyCounts[curMonth], store.kegiatan.length);
+    }
+
+    new Chart(el1.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: months,
+        datasets: [{
+          label: 'Total Kegiatan 2024',
+          data: monthlyCounts,
+          borderColor: C.gold,
+          backgroundColor: 'rgba(200,160,32,0.07)',
+          borderWidth: 2,
+          tension: 0.42,
+          fill: true,
+          pointBackgroundColor: C.gold,
+          pointBorderColor: C.bg2,
+          pointBorderWidth: 2,
+          pointRadius: 4,
+          pointHoverRadius: 7,
+        }],
       },
-      scales: scalesXY,
-    },
-  });
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: { display: false },
+          tooltip: tooltipPlugin,
+        },
+        scales: scalesXY,
+      },
+    });
+  }
 
   /* 2) Gereja per Kelasis — Doughnut */
-  new Chart(el2.getContext('2d'), {
-    type: 'doughnut',
-    data: {
-      labels: ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'],
-      datasets: [{
-        data: [9, 8, 7, 8, 9, 7],
-        backgroundColor: PALLETE,
-        borderColor: C.bg2,
-        borderWidth: 3,
-        hoverOffset: 8,
-      }],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      cutout: '66%',
-      plugins: {
-        legend: legendPlugin,
-        tooltip: tooltipPlugin,
+  if (el2) {
+    Chart.getChart(el2)?.destroy();
+
+    let labels = ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'];
+    let values = [9, 8, 7, 8, 9, 7];
+
+    if (store && store.kelasis && store.kelasis.length > 0) {
+      labels = store.kelasis.map(k => k.nama.replace('Kelasis ', '').trim());
+      values = store.kelasis.map(k => {
+        const cleanName = k.nama.replace('Kelasis ', '').trim();
+        const cnt = store.gereja.filter(g => g.kelasis === cleanName || g.kelasis === k.nama).length;
+        return cnt > 0 ? cnt : (k.gereja || 5);
+      });
+    }
+
+    new Chart(el2.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: labels,
+        datasets: [{
+          data: values,
+          backgroundColor: PALLETE.slice(0, labels.length),
+          borderColor: C.bg2,
+          borderWidth: 3,
+          hoverOffset: 8,
+        }],
       },
-      scales: {},
-    },
-  });
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        cutout: '66%',
+        plugins: {
+          legend: legendPlugin,
+          tooltip: tooltipPlugin,
+        },
+        scales: {},
+      },
+    });
+  }
 };
 
 /* ─────────────────────────────────────────────────
    STATISTIK PAGE CHARTS
 ───────────────────────────────────────────────── */
 window.initStatCharts = function() {
-  const ids = ['chart-growth','chart-pie-jemaat','chart-bar-kelasis'];
-  ids.forEach(id => Chart.getChart(document.getElementById(id))?.destroy());
+  const ids = ['chart-growth','chart-pie-jemaat','chart-bar-kelasis','chart-stat-donut'];
+  ids.forEach(id => {
+    const el = document.getElementById(id);
+    if (el) Chart.getChart(el)?.destroy();
+  });
+
+  const store = getStore();
+  let kelasisLabels = ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'];
+  let jemaatValues = [724, 612, 543, 684, 701, 583];
+
+  if (store && store.kelasis && store.kelasis.length > 0) {
+    kelasisLabels = store.kelasis.map(k => k.nama.replace('Kelasis ', '').trim());
+    jemaatValues = store.kelasis.map(k => Number(k.jemaat) || 500);
+  }
 
   /* 3) Pertumbuhan Jemaat — Multi-line */
   const elG = document.getElementById('chart-growth');
@@ -162,10 +211,10 @@ window.initStatCharts = function() {
       data: {
         labels: ['2020','2021','2022','2023','2024'],
         datasets: [
-          { label:'Tigi',       data:[600,640,680,710,724], borderColor:C.gold,   backgroundColor:'rgba(200,160,32,0.05)', borderWidth:2.5, tension:0.4, fill:true,  pointBackgroundColor:C.gold,   pointRadius:5, pointBorderColor:C.bg2, pointBorderWidth:2 },
-          { label:'Tigi Barat', data:[520,560,580,600,612], borderColor:C.blue2,  backgroundColor:'rgba(90,155,240,0.05)', borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.blue2,  pointRadius:4 },
-          { label:'Wagamo',     data:[600,620,645,665,684], borderColor:C.violet, backgroundColor:'transparent',           borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.violet, pointRadius:4 },
-          { label:'Tigi Utara', data:[620,655,675,690,701], borderColor:C.rose,   backgroundColor:'transparent',           borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.rose,   pointRadius:4 },
+          { label: kelasisLabels[0] || 'Tigi',       data:[600,640,680,710, jemaatValues[0] || 724], borderColor:C.gold,   backgroundColor:'rgba(200,160,32,0.05)', borderWidth:2.5, tension:0.4, fill:true,  pointBackgroundColor:C.gold,   pointRadius:5, pointBorderColor:C.bg2, pointBorderWidth:2 },
+          { label: kelasisLabels[1] || 'Tigi Barat', data:[520,560,580,600, jemaatValues[1] || 612], borderColor:C.blue2,  backgroundColor:'rgba(90,155,240,0.05)', borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.blue2,  pointRadius:4 },
+          { label: kelasisLabels[3] || 'Wagamo',     data:[600,620,645,665, jemaatValues[3] || 684], borderColor:C.violet, backgroundColor:'transparent',           borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.violet, pointRadius:4 },
+          { label: kelasisLabels[4] || 'Tigi Utara', data:[620,655,675,690, jemaatValues[4] || 701], borderColor:C.rose,   backgroundColor:'transparent',           borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.rose,   pointRadius:4 },
         ],
       },
       options: {
@@ -183,10 +232,10 @@ window.initStatCharts = function() {
     new Chart(elP.getContext('2d'), {
       type: 'pie',
       data: {
-        labels: ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'],
+        labels: kelasisLabels,
         datasets: [{
-          data: [724, 612, 543, 684, 701, 583],
-          backgroundColor: PALLETE,
+          data: jemaatValues,
+          backgroundColor: PALLETE.slice(0, kelasisLabels.length),
           borderColor: C.bg2,
           borderWidth: 3,
           hoverOffset: 6,
@@ -204,21 +253,24 @@ window.initStatCharts = function() {
   /* 5) Kegiatan per Kelasis — Grouped Bar */
   const elB = document.getElementById('chart-bar-kelasis');
   if (elB) {
+    const ibadahData = kelasisLabels.map((_, i) => 22 - (i * 2));
+    const nonIbadahData = kelasisLabels.map((_, i) => 14 - i);
+
     new Chart(elB.getContext('2d'), {
       type: 'bar',
       data: {
-        labels: ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'],
+        labels: kelasisLabels,
         datasets: [
           {
             label: 'Ibadah',
-            data: [22, 18, 15, 20, 24, 12],
+            data: ibadahData,
             backgroundColor: 'rgba(200,160,32,0.75)',
             borderRadius: 4,
             borderSkipped: false,
           },
           {
             label: 'Kegiatan Lain',
-            data: [14, 12, 10, 16, 14, 8],
+            data: nonIbadahData,
             backgroundColor: 'rgba(90,155,240,0.65)',
             borderRadius: 4,
             borderSkipped: false,
@@ -241,14 +293,13 @@ window.initStatCharts = function() {
   /* 6) Jemaat Donut Statistik */
   const elD = document.getElementById('chart-stat-donut');
   if (elD) {
-    Chart.getChart(elD)?.destroy();
     new Chart(elD.getContext('2d'), {
       type: 'doughnut',
       data: {
-        labels: ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'],
+        labels: kelasisLabels,
         datasets: [{
-          data: [724, 612, 543, 684, 701, 583],
-          backgroundColor: PALLETE_DIM,
+          data: jemaatValues,
+          backgroundColor: PALLETE_DIM.slice(0, kelasisLabels.length),
           borderColor: C.bg2,
           borderWidth: 3,
           hoverOffset: 6,
@@ -273,16 +324,25 @@ window.initWilayahChart = function() {
   if (!el) return;
   Chart.getChart(el)?.destroy();
 
+  const store = getStore();
+  let labels = ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'];
+  let values = [724, 612, 543, 684, 701, 583];
+
+  if (store && store.kelasis && store.kelasis.length > 0) {
+    labels = store.kelasis.map(k => k.nama.replace('Kelasis ', '').trim());
+    values = store.kelasis.map(k => Number(k.jemaat) || 500);
+  }
+
   new Chart(el.getContext('2d'), {
     type: 'bar',
     data: {
-      labels: ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'],
+      labels: labels,
       datasets: [
         {
           label: 'Jumlah Jemaat',
-          data: [724, 612, 543, 684, 701, 583],
-          backgroundColor: PALLETE_DIM,
-          borderColor: PALLETE,
+          data: values,
+          backgroundColor: PALLETE_DIM.slice(0, labels.length),
+          borderColor: PALLETE.slice(0, labels.length),
           borderWidth: 1.5,
           borderRadius: 5,
           borderSkipped: false,

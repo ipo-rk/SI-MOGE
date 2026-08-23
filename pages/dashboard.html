@@ -157,6 +157,30 @@
 
         </div><!-- /stats-grid -->
 
+        <!-- ── Quick Guide / Bantuan Banner ── -->
+        <div class="card"
+          style="margin-bottom:20px;background:linear-gradient(135deg, rgba(200,160,32,0.12) 0%, rgba(52,120,213,0.08) 100%);border-color:var(--border2)">
+          <div
+            style="padding:16px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:14px">
+              <div
+                style="width:44px;height:44px;border-radius:12px;background:var(--gold-dim);border:1px solid var(--gold);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">
+                📖</div>
+              <div>
+                <div style="font-family:'Playfair Display',serif;font-size:15px;font-weight:700;color:var(--gold2)">
+                  Panduan Penggunaan Sistem (Pemula &amp; Lanjutan)</div>
+                <div style="font-size:12px;color:var(--text2);margin-top:2px">Pelajari cara mengelola data gereja,
+                  unggah foto gereja, input jemaat, alur laporan, hingga backup database.</div>
+              </div>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+              <a href="gereja.html" class="btn btn-outline btn-sm">⛪ Foto Gereja</a>
+              <a href="jemaat.html" class="btn btn-outline btn-sm">👥 Data Jemaat</a>
+              <a href="panduan.html" class="btn btn-primary btn-sm">Buka Panduan Lengkap →</a>
+            </div>
+          </div>
+        </div>
+
         <!-- ══ Konten SA & AK ══ -->
         <template x-if="$store.auth.user?.role !== 'Operator Gereja'">
           <div>
@@ -341,6 +365,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/logo-data.js"></script>
   <script src="../assets/js/app.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>

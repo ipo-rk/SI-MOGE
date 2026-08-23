@@ -26,7 +26,9 @@
             <p>Rekam jejak aktivitas seluruh pengguna sistem</p>
           </div>
           <div class="page-actions">
-            <button class="btn btn-outline">⬇ Export Log</button>
+            <button class="btn btn-outline" @click="exportPDF()">📄 PDF</button>
+            <button class="btn btn-outline" @click="exportWord()">📝 Word</button>
+            <button class="btn btn-outline" @click="exportData('CSV')">⬇ CSV</button>
             <button class="btn btn-danger" @click="clearLog()">🗑 Bersihkan Log</button>
           </div>
         </div>
@@ -73,6 +75,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/logo-data.js"></script>
   <script src="../assets/js/app.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

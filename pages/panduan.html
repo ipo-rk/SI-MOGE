@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SIMGK Deiyai — Panduan Penggunaan</title>
+  <link rel="stylesheet" href="../assets/css/style.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+
+    .guide-hero {
+      background: linear-gradient(135deg, rgba(200, 160, 32, 0.12) 0%, rgba(52, 120, 213, 0.08) 100%);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-lg);
+      padding: 26px 28px;
+      margin-bottom: 24px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .guide-hero::after {
+      content: '📖';
+      position: absolute;
+      right: 24px;
+      bottom: -10px;
+      font-size: 90px;
+      opacity: 0.12;
+      pointer-events: none;
+    }
+
+    .guide-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .guide-tab {
+      padding: 8px 16px;
+      border-radius: var(--r-sm);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-size: 12.5px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .guide-tab:hover {
+      border-color: var(--gold);
+      color: var(--gold2);
+    }
+
+    .guide-tab.active {
+      background: var(--gold-dim);
+      border-color: var(--gold);
+      color: var(--gold2);
+      font-weight: 600;
+      box-shadow: 0 0 12px rgba(200, 160, 32, 0.15);
+    }
+
+    .guide-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    .guide-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+
+    .guide-card:hover {
+      border-color: var(--border2);
+    }
+
+    .guide-card-head {
+      padding: 16px 20px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .guide-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .guide-card-badge {
+      font-size: 10.5px;
+      padding: 3px 8px;
+      border-radius: 99px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .guide-card-body {
+      padding: 20px;
+      font-size: 13.5px;
+      line-height: 1.68;
+      color: var(--text2);
+    }
+
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 14px 0;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--surface);
+      padding: 12px 14px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+    }
+
+    .step-num {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      color: var(--gold2);
+      border: 1px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11.5px;
+      font-weight: 700;
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 3px;
+      font-size: 13px;
+    }
+
+    .step-desc {
+      color: var(--text2);
+      font-size: 12px;
+    }
+
+    .callout-box {
+      border-left: 3px solid var(--gold);
+      background: var(--gold-dim);
+      padding: 10px 14px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      margin: 12px 0;
+      font-size: 12.5px;
+      color: var(--text);
+    }
+
+    .callout-box.info {
+      border-left-color: var(--blue2);
+      background: rgba(90, 155, 240, 0.1);
+    }
+
+    .callout-box.success {
+      border-left-color: var(--teal);
+      background: rgba(22, 184, 154, 0.1);
+    }
+
+    .callout-box.danger {
+      border-left-color: var(--rose);
+      background: rgba(221, 85, 102, 0.1);
+    }
+  </style>
+</head>
+
+<body x-data="layout('panduan')">
+  <div class="sidebar-overlay" id="simgk-overlay"></div>
+  <div class="app-layout">
+    <div class="main-area">
+
+      <main class="page-content" x-data="{
+        tab: 'all',
+        openItems: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true },
+        toggle(idx) { this.openItems[idx] = !this.openItems[idx]; },
+        expandAll() { for (let k in this.openItems) this.openItems[k] = true; },
+        collapseAll() { for (let k in this.openItems) this.openItems[k] = false; }
+      }">
+
+        <!-- Page Header -->
+        <div class="page-header">
+          <div class="page-title-block">
+            <h2>Panduan Penggunaan Sistem</h2>
+            <p>Petunjuk operasional lengkap, alur kerja, dan tutorial dashboard SIMGK Deiyai</p>
+          </div>
+          <div class="page-actions">
+            <a href="../README.md" target="_blank" class="btn btn-outline">📖 Buka README.md</a>
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Cetak Panduan</button>
+          </div>
+        </div>
+
+        <!-- Hero Card -->
+        <div class="guide-hero">
+          <div style="font-family:'Playfair Display',serif;font-size:20px;font-weight:700;color:var(--gold2);margin-bottom:6px">
+            Pusat Bantuan &amp; Panduan Pengoperasian Dashboard
+          </div>
+          <p style="font-size:13px;color:var(--text2);max-width:740px;margin-bottom:14px">
+            Panduan lengkap ini membantu Anda menjalankan seluruh proses kerja di dalam sistem SIMGK Deiyai, mulai dari input data jemaat, unggah foto gereja, pencatatan kegiatan, alur persetujuan laporan, hingga pencadangan database.
+          </p>
+          <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+            <span class="badge badge-gold">Versi 3.5 Final</span>
+            <span class="badge badge-teal">✓ Persistent LocalStorage</span>
+            <span class="badge badge-blue">✓ Cross-Tab Realtime Sync</span>
+            <span class="badge badge-violet">✓ Showcase Foto Gereja</span>
+          </div>
+        </div>
+
+        <!-- Filter Toolbar -->
+        <div class="toolbar" style="margin-bottom:16px;justify-content:space-between">
+          <div class="guide-tabs" style="margin-bottom:0">
+            <button class="guide-tab" :class="{active: tab==='all'}" @click="tab='all'">📋 Semua Panduan</button>
+            <button class="guide-tab" :class="{active: tab==='auth'}" @click="tab='auth'">🔑 Akun &amp; Akses</button>
+            <button class="guide-tab" :class="{active: tab==='gereja'}" @click="tab='gereja'">⛪ Gereja &amp; Jemaat</button>
+            <button class="guide-tab" :class="{active: tab==='laporan'}" @click="tab='laporan'">📋 Laporan &amp; Kegiatan</button>
+            <button class="guide-tab" :class="{active: tab==='sistem'}" @click="tab='sistem'">⚙️ Backup &amp; Sistem</button>
+          </div>
+          <div style="display:flex;gap:8px;align-items:center">
+            <button class="btn btn-ghost btn-sm" @click="expandAll()">➕ Buka Semua</button>
+            <button class="btn btn-ghost btn-sm" @click="collapseAll()">➖ Tutup Semua</button>
+          </div>
+        </div>
+
+        <!-- Guide Cards Grid -->
+        <div class="guide-grid">
+
+          <!-- Card 1: Akun Demo & Login -->
+          <div class="guide-card" x-show="tab==='all'||tab==='auth'">
+            <div class="guide-card-head" @click="toggle(1)">
+              <div class="guide-card-title">
+                <span>🔑</span> 1. Autentikasi &amp; Hak Akses 3 Peran Pengguna
+              </div>
+              <span class="guide-card-badge badge-gold" x-text="openItems[1] ? '▲ Tutup' : '▼ Lihat'"></span>
+            </div>
+            <div class="guide-card-body" x-show="openItems[1]" x-transition>
+              <p>Sistem menerapkan <strong>Role-Based Access Control (RBAC)</strong> dengan 3 tingkatan:</p>
+              
+              <div class="table-wrap" style="margin:12px 0">
+                <table class="data-table">
+                  <thead>
+                    <tr>
+                      <th>Peran / Role</th>
+                      <th>Email Akun Demo</th>
+                      <th>Password</th>
+                      <th>Cakupan Hak Akses</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td class="td-primary"><span class="badge badge-gold">👑 Super Admin</span></td>
+                      <td class="td-mono">admin@deiyai.id</td>
+                      <td class="td-mono">admin123</td>
+                      <td>Akses penuh 14 modul (Manajemen Pengguna, Activity Log, Backup/Restore).</td>
+                    </tr>
+                    <tr>
+                      <td class="td-primary"><span class="badge badge-blue">🏛️ Admin Kelasis</span></td>
+                      <td class="td-mono">tigi@deiyai.id</td>
+                      <td class="td-mono">kelasis123</td>
+                      <td>12 Modul (Statistik, Kelasis, Gereja, Jemaat, Laporan, Dokumen, Ekspor, Panduan).</td>
+                    </tr>
+                    <tr>
+                      <td class="td-primary"><span class="badge badge-violet">⛪ Operator Gereja</span></td>
+                      <td class="td-mono">gke.tigi@deiyai.id</td>
+                      <td class="td-mono">operator123</td>
+                      <td>8 Modul (Dashboard gereja, Jemaat, Kegiatan, Dokumen, Pengumuman, Panduan).</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Gereja & Foto Gereja -->
+          <div class="guide-card" x-show="tab==='all'||tab==='gereja'">
+            <div class="guide-card-head" @click="toggle(2)">
+              <div class="guide-card-title">
+                <span>⛪</span> 2. Manajemen Gereja &amp; Unggah / Lihat Foto Gereja (Showcase Detail)
+              </div>
+              <span class="guide-card-badge badge-blue" x-text="openItems[2] ? '▲ Tutup' : '▼ Lihat'"></span>
+            </div>
+            <div class="guide-card-body" x-show="openItems[2]" x-transition>
+              <div class="step-list">
+                <div class="step-item">
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <div class="step-title">Melihat Foto &amp; Profil Gereja (Modal View)</div>
+                    <div class="step-desc">Buka menu <a href="gereja.html" style="color:var(--gold2)">Gereja</a>, klik tombol mata <strong>👁️</strong> pada baris tabel gereja. Modal detail akan muncul menampilkan <em>Banner Showcase Foto Gereja</em> beresolusi tinggi beserta nama gembala, tahun berdiri, jemaat, dan alamat.</div>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <div class="step-title">Menambahkan Gereja &amp; Unggah Foto</div>
+                    <div class="step-desc">Klik tombol <strong>＋ Tambah Gereja</strong>. Isi data gereja dan pilih foto gereja dari perangkat lokal (maks 2MB). Pratinjau gambar akan otomatis tampil.</div>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">3</div>
+                  <div class="step-content">
+                    <div class="step-title">Penyimpanan Persisten</div>
+                    <div class="step-desc">Foto dikonversi ke format base64 dan tersimpan permanen di LocalStorage browser.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Data Jemaat -->
+          <div class="guide-card" x-show="tab==='all'||tab==='gereja'">
+            <div class="guide-card-head" @click="toggle(3)">
+              <div class="guide-card-title">
+                <span>👥</span> 3. Manajemen Data Jemaat, Filter &amp; Impor/Ekspor JSON/CSV
+              </div>
+              <span class="guide-card-badge badge-teal" x-text="openItems[3] ? '▲ Tutup' : '▼ Lihat'"></span>
+            </div>
+            <div class="guide-card-body" x-show="openItems[3]" x-transition>
+              <div class="step-list">
+                <div class="step-item">
+                  <div class="step-num">1</div>
+                  <div class="step-content">
+                    <div class="step-title">Penyaringan Multi-Kolom</div>
+                    <div class="step-desc">Gunakan filter Kelasis, Status (Aktif / Pindah / Meninggal), Gender, dan pencarian nama pada menu <a href="jemaat.html" style="color:var(--gold2)">Jemaat</a>.</div>
+                  </div>
+                </div>
+                <div class="step-item">
+                  <div class="step-num">2</div>
+                  <div class="step-content">
+                    <div class="step-title">Ekspor CSV &amp; Impor Massal JSON</div>
+                    <div class="step-desc">Klik <strong>⬇ Export CSV</strong> untuk unduh data jemaat atau <strong>⬆ Import Data</strong> untuk upload berkas JSON.</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: Monitoring Kegiatan -->
+          <div class="guide-card" x-show="tab==='all'||tab==='laporan'">
+            <div class="guide-card-head" @click="toggle(4)">
+              <div class="guide-card-title">
+                <span>📅</span> 4. Monitoring Kegiatan &amp; Pencatatan 9 Jenis Ibadah
+              </div>
+              <span class="guide-card-badge badge-rose" x-text="openItems[4] ? '▲ Tutup' : '▼ Lihat'"></span>
+            </div>
+            <div class="guide-card-body" x-show="openItems[4]" x-transition>
+              <p>Mencatat 9 jenis kegiatan: <em>Ibadah Minggu, Pemuda, Wanita, Sekolah Minggu, Baptisan, Pernikahan, Dukacita, Seminar, dan Pelayanan Sosial</em> pada menu <a href="kegiatan.html" style="color:var(--gold2)">Kegiatan</a>. Grafik bulanan akan otomatis ter-update.</p>
+            </div>
+          </div>
+
+          <!-- Card 5: Laporan Pelayanan -->
+          <div class="guide-card" x-show="tab==='all'||tab==='laporan'">
+            <div class="guide-card-head" @click="toggle(5)">
+              <div class="guide-card-title">
+                <span>📋</span> 5. Laporan Pelayanan &amp; Alur Persetujuan (Approval Workflow)
+              </div>
+              <span class="guide-card-badge badge-lime" x-text="openItems[5] ? '▲ Tutup' : '▼ Lihat'"></span>
+            </div>
+            <div class="guide-card-body" x-show="openItems[5]" x-transition>
+              <p>Admin Kelasis membuat laporan (<span class="badge badge-amber">⏳ Proses</span>). Super Admin memeriksa dan menyetujui laporan via tombol centang hijau <strong>✓</strong> menjadi (<span class="badge badge-teal">✓ Diterima</span>) pada menu <a href="laporan.html" style="color:var(--gold2)">Laporan Pelayanan</a>.</p>
+            </div>
+          </div>
+
+          <!-- Card 6: Backup & Restore -->
+          <div class="guide-card" x-show="tab==='all'||tab==='sistem'">
+            <div class="guide-card-head" @click="toggle(6)">
+              <div class="guide-card-title">
+                <span>💾</span> 6. Pencadangan (Backup) &amp; Pemulihan (Restore) Database
+              </div>
+              <span class="guide-card-badge badge-violet" x-text="openItems[6] ? '▲ Tutup' : '▼ Lihat'"></span>
+            </div>
+            <div class="guide-card-body" x-show="openItems[6]" x-transition>
+              <p>Super Admin dapat mengunduh backup database JSON pada menu <a href="pengaturan.html" style="color:var(--gold2)">Pengaturan</a> via tombol <strong>🔄 Backup Sekarang</strong> dan memulihkannya kembali via tombol <strong>♻️ Restore Backup</strong>.</p>
+            </div>
+          </div>
+
+          <!-- Card 7: FAQ -->
+          <div class="guide-card" x-show="tab==='all'||tab==='sistem'">
+            <div class="guide-card-head" @click="toggle(7)">
+              <div class="guide-card-title">
+                <span>❓</span> 7. Pertanyaan yang Sering Diajukan (FAQ)
+              </div>
+              <span class="guide-card-badge badge-gold" x-text="openItems[7] ? '▲ Tutup' : '▼ Lihat'"></span>
+            </div>
+            <div class="guide-card-body" x-show="openItems[7]" x-transition>
+              <p>Untuk panduan teknis mendalam dan source code references, buka berkas <a href="../README.md" target="_blank" style="color:var(--gold2)">README.md</a>.</p>
+            </div>
+          </div>
+
+        </div><!-- /guide-grid -->
+
+      </main>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/logo-data.js"></script>
+  <script src="../assets/js/app.js"></script>
+  <script src="../assets/js/layout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      buildLayout('panduan', 'Panduan Penggunaan', 'Panduan');
+    });
+  </script>
+</body>
+
+</html>

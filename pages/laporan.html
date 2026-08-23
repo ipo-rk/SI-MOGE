@@ -26,7 +26,9 @@
             <p>Laporan dari seluruh kelasis kepada Koordinator</p>
           </div>
           <div class="page-actions">
-            <button class="btn btn-outline">⬇ Export PDF</button>
+            <button class="btn btn-outline" @click="exportPDF()">📄 PDF</button>
+            <button class="btn btn-outline" @click="exportWord()">📝 Word</button>
+            <button class="btn btn-outline" @click="exportData('CSV')">⬇ CSV</button>
             <button class="btn btn-primary" @click="openAdd()">＋ Buat Laporan</button>
           </div>
         </div>
@@ -39,12 +41,9 @@
           </select>
           <select class="f-select" x-model="filterKelasis">
             <option value="">Semua Kelasis</option>
-            <option>Tigi</option>
-            <option>Tigi Barat</option>
-            <option>Yatamo</option>
-            <option>Wagamo</option>
-            <option>Tigi Utara</option>
-            <option>Debey</option>
+            <template x-for="k in kelasisList" :key="k.id">
+              <option :value="k.nama.replace('Kelasis ', '').trim()" x-text="k.nama"></option>
+            </template>
           </select>
           <select class="f-select" x-model="filterStatus">
             <option value="">Semua Status</option>
@@ -134,12 +133,9 @@
                   <select class="form-select" x-model="form.kelasis" @change="formError=''"
                     :style="formError&&!form.kelasis?'border-color:var(--rose)':''">
                     <option value="">— Pilih Kelasis —</option>
-                    <option>Tigi</option>
-                    <option>Tigi Barat</option>
-                    <option>Yatamo</option>
-                    <option>Wagamo</option>
-                    <option>Tigi Utara</option>
-                    <option>Debey</option>
+                    <template x-for="k in kelasisList" :key="k.id">
+                      <option :value="k.nama.replace('Kelasis ', '').trim()" x-text="k.nama"></option>
+                    </template>
                   </select>
                 </div>
                 <div class="form-group form-full"><label class="form-label">Periode</label>
@@ -196,6 +192,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/logo-data.js"></script>
   <script src="../assets/js/app.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

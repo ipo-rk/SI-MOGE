@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panduan Penggunaan — SIMGK Deiyai</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link
+    href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+    rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <style>
+    [x-cloak] {
+      display: none !important;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Standalone Public Navbar */
+    .public-navbar {
+      background: rgba(9, 17, 31, 0.96);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 5%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(20px);
+    }
+
+    .public-logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+    }
+
+    .public-logo-mark {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--gold2), #8a6a0a);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+      box-shadow: 0 4px 16px rgba(200, 160, 32, 0.35);
+    }
+
+    .public-logo-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--gold2);
+      line-height: 1.2;
+    }
+
+    .public-logo-sub {
+      font-size: 11px;
+      color: var(--text3);
+      letter-spacing: 0.6px;
+    }
+
+    .public-nav-links {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      list-style: none;
+    }
+
+    /* Guide Container */
+    .guide-wrapper {
+      max-width: 1080px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 36px 20px 80px;
+      flex: 1;
+    }
+
+    .guide-hero {
+      background: linear-gradient(135deg, rgba(200, 160, 32, 0.15) 0%, rgba(52, 120, 213, 0.1) 100%);
+      border: 1px solid var(--border2);
+      border-radius: var(--r-xl);
+      padding: 36px 32px;
+      margin-bottom: 30px;
+      position: relative;
+      overflow: hidden;
+      box-shadow: var(--shadow-md);
+    }
+
+    .guide-hero::after {
+      content: '📖';
+      position: absolute;
+      right: 24px;
+      bottom: -15px;
+      font-size: 120px;
+      opacity: 0.09;
+      pointer-events: none;
+    }
+
+    .guide-hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 12px;
+      background: var(--gold-dim);
+      border: 1px solid rgba(200, 160, 32, 0.3);
+      border-radius: 99px;
+      color: var(--gold2);
+      font-size: 11.5px;
+      font-weight: 600;
+      margin-bottom: 12px;
+    }
+
+    .guide-hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 26px;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 10px;
+    }
+
+    .guide-hero-desc {
+      font-size: 14px;
+      color: var(--text2);
+      max-width: 800px;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    /* Overview 3 Cards */
+    .fo-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 860px) {
+      .fo-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .public-navbar {
+        padding: 14px 4%;
+      }
+    }
+
+    .fo-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      transition: border-color 0.2s;
+    }
+
+    .fo-card:hover {
+      border-color: var(--gold);
+    }
+
+    .fo-icon {
+      font-size: 30px;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    .fo-title {
+      font-weight: 700;
+      color: var(--text);
+      font-size: 14.5px;
+      font-family: 'Playfair Display', serif;
+    }
+
+    .fo-desc {
+      font-size: 12.5px;
+      color: var(--text3);
+      line-height: 1.6;
+    }
+
+    /* Tabs */
+    .guide-tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 22px;
+    }
+
+    .guide-tab {
+      padding: 9px 18px;
+      border-radius: var(--r-sm);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text2);
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .guide-tab:hover {
+      border-color: var(--gold);
+      color: var(--gold2);
+      background: var(--surface2);
+    }
+
+    .guide-tab.active {
+      background: var(--gold-dim);
+      border-color: var(--gold);
+      color: var(--gold2);
+      font-weight: 600;
+      box-shadow: 0 0 14px rgba(200, 160, 32, 0.16);
+    }
+
+    /* Accordion Guide Cards */
+    .guide-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 18px;
+    }
+
+    .guide-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      overflow: hidden;
+      transition: all 0.22s ease;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .guide-card:hover {
+      border-color: var(--border2);
+    }
+
+    .guide-card-head {
+      padding: 18px 22px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+      user-select: none;
+      transition: background 0.2s;
+    }
+
+    .guide-card-head:hover {
+      background: var(--surface2);
+    }
+
+    .guide-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .guide-card-badge {
+      font-size: 11px;
+      padding: 4px 10px;
+      border-radius: 99px;
+      font-weight: 600;
+      font-family: 'DM Sans', sans-serif;
+    }
+
+    .guide-card-body {
+      padding: 24px;
+      font-size: 13.5px;
+      line-height: 1.7;
+      color: var(--text2);
+    }
+
+    /* Step items */
+    .step-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin: 16px 0;
+    }
+
+    .step-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      background: var(--surface);
+      padding: 14px 16px;
+      border-radius: var(--r-sm);
+      border: 1px solid var(--border);
+      transition: border-color 0.2s;
+    }
+
+    .step-item:hover {
+      border-color: var(--border2);
+    }
+
+    .step-num {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--gold-dim);
+      color: var(--gold2);
+      border: 1.5px solid var(--gold);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      flex-shrink: 0;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .step-content {
+      flex: 1;
+    }
+
+    .step-title {
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 4px;
+      font-size: 13.5px;
+    }
+
+    .step-desc {
+      color: var(--text2);
+      font-size: 12.5px;
+      line-height: 1.6;
+    }
+
+    .callout-box {
+      border-left: 3.5px solid var(--gold);
+      background: var(--gold-dim);
+      padding: 12px 16px;
+      border-radius: 0 var(--r-sm) var(--r-sm) 0;
+      margin: 14px 0;
+      font-size: 13px;
+      color: var(--text);
+      line-height: 1.6;
+    }
+
+    .callout-box.info {
+      border-left-color: var(--blue2);
+      background: rgba(90, 155, 240, 0.1);
+    }
+
+    .callout-box.success {
+      border-left-color: var(--teal);
+      background: rgba(22, 184, 154, 0.1);
+    }
+
+    /* Footer */
+    .public-footer {
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      padding: 24px 5%;
+      text-align: center;
+      font-size: 12px;
+      color: var(--text3);
+    }
+
+    .public-footer a {
+      color: var(--text2);
+      text-decoration: none;
+    }
+
+    .public-footer a:hover {
+      color: var(--gold2);
+    }
+  </style>
+</head>
+
+<body x-data="{
+  tab: 'all',
+  openItems: { 1: true, 2: true, 3: true, 4: true, 5: true, 6: true, 7: true },
+  toggle(idx) { this.openItems[idx] = !this.openItems[idx]; },
+  expandAll() { for (let k in this.openItems) this.openItems[k] = true; },
+  collapseAll() { for (let k in this.openItems) this.openItems[k] = false; }
+}">
+
+  <!-- ══════════════ NAVBAR PUBLIK ══════════════ -->
+  <nav class="public-navbar">
+    <a href="index.html" class="public-logo">
+      <div class="public-logo-mark" style="background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;"><img src="assets/img/logo.png" alt="Logo Sinode KINGMI Papua" style="width:38px;height:38px;object-fit:contain;"></div>
+      <div>
+        <div class="public-logo-title">SIMGK Deiyai</div>
+        <div class="public-logo-sub">Panduan Penggunaan Sistem</div>
+      </div>
+    </a>
+    <div class="public-nav-links">
+      <a href="index.html" class="btn btn-outline btn-sm">← Beranda</a>
+      <a href="README.md" target="_blank" class="btn btn-outline btn-sm">📄 README</a>
+      <a href="login.html" class="btn btn-primary btn-sm">🚀 Masuk Sistem →</a>
+    </div>
+  </nav>
+
+  <!-- ══════════════ KONTEN PANDUAN ══════════════ -->
+  <div class="guide-wrapper">
+
+    <!-- Hero Card -->
+    <div class="guide-hero">
+      <div class="guide-hero-badge">📖 Panduan Resmi Pengguna Publik</div>
+      <div class="guide-hero-title">
+        Panduan Memulai &amp; Mengoperasikan SIMGK Deiyai
+      </div>
+      <div class="guide-hero-desc">
+        Selamat datang di pusat bantuan SIMGK Deiyai (Sistem Monitoring Gereja Koordinator Deiyai, Papua Tengah).
+        Halaman ini menyajikan tutorial visual langkah demi langkah agar Anda dapat memahami seluruh alur pelayanan
+        dengan mudah dan cepat.
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <a href="login.html" class="btn btn-primary btn-sm">🔑 Coba 3 Akun Demo</a>
+        <a href="index.html#fitur" class="btn btn-outline btn-sm">✨ Lihat Fitur Utama</a>
+        <!-- <button class="btn btn-outline btn-sm" onclick="window.print()">🖨️ Cetak Panduan</button> -->
+      </div>
+    </div>
+
+    <!-- 3 Quick Pillar Cards -->
+    <div class="fo-grid">
+      <div class="fo-card">
+        <div class="fo-icon">⛪</div>
+        <div class="fo-title">1. Galeri &amp; Foto Gereja</div>
+        <div class="fo-desc">Lihat profil 48 gereja lengkap dengan foto arsitektur gereja beresolusi tinggi dan opsi
+          unggah foto.</div>
+      </div>
+      <div class="fo-card">
+        <div class="fo-icon">👥</div>
+        <div class="fo-title">2. Manajemen 3.847+ Jemaat</div>
+        <div class="fo-desc">Penyaringan multi-kolom (kelasis, status, gender), ekspor CSV cepat, serta impor massal
+          file JSON.</div>
+      </div>
+      <div class="fo-card">
+        <div class="fo-icon">📋</div>
+        <div class="fo-title">3. Laporan &amp; Approval</div>
+        <div class="fo-desc">Alur pengiriman laporan pelayanan dari Admin Kelasis hingga disetujui resmi oleh
+          Koordinator Deiyai.</div>
+      </div>
+    </div>
+
+    <!-- Filter Toolbar -->
+    <div class="toolbar"
+      style="margin-bottom:20px;justify-content:space-between;background:transparent;border:none;padding:0">
+      <div class="guide-tabs" style="margin-bottom:0">
+        <button class="guide-tab" :class="{active: tab==='all'}" @click="tab='all'">📋 Semua Topik</button>
+        <button class="guide-tab" :class="{active: tab==='auth'}" @click="tab='auth'">🔑 Akun &amp; Login</button>
+        <button class="guide-tab" :class="{active: tab==='gereja'}" @click="tab='gereja'">⛪ Gereja &amp; Jemaat</button>
+        <button class="guide-tab" :class="{active: tab==='laporan'}" @click="tab='laporan'">📋 Laporan &amp;
+          Ibadah</button>
+        <button class="guide-tab" :class="{active: tab==='sistem'}" @click="tab='sistem'">⚙️ Backup &amp; FAQ</button>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button class="btn btn-ghost btn-sm" @click="expandAll()">➕ Buka Semua</button>
+        <button class="btn btn-ghost btn-sm" @click="collapseAll()">➖ Tutup Semua</button>
+      </div>
+    </div>
+
+    <!-- Accordion Cards -->
+    <div class="guide-grid">
+
+      <!-- Card 1: Akun Demo -->
+      <div class="guide-card" x-show="tab==='all'||tab==='auth'">
+        <div class="guide-card-head" @click="toggle(1)">
+          <div class="guide-card-title">
+            <span>🔑</span> 1. Cara Masuk Sistem &amp; Memilih 3 Akun Demo
+          </div>
+          <span class="guide-card-badge badge-gold" x-text="openItems[1] ? '▲ Tutup' : '▼ Buka'"></span>
+        </div>
+        <div class="guide-card-body" x-show="openItems[1]" x-transition>
+          <p>Sistem dapat dieksplorasi langsung tanpa registrasi menggunakan 3 akun demo resmi:</p>
+
+          <div class="table-wrap" style="margin:14px 0">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Peran Pengguna</th>
+                  <th>Email Login</th>
+                  <th>Password</th>
+                  <th>Cakupan Hak Akses</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td class="td-primary"><span class="badge badge-gold">👑 Super Admin</span></td>
+                  <td class="td-mono">admin@deiyai.id</td>
+                  <td class="td-mono">admin123</td>
+                  <td>Akses penuh seluruh 14 modul sistem, kelola pengguna, audit log, dan backup/restore.</td>
+                </tr>
+                <tr>
+                  <td class="td-primary"><span class="badge badge-blue">🏛️ Admin Kelasis</span></td>
+                  <td class="td-mono">tigi@deiyai.id</td>
+                  <td class="td-mono">kelasis123</td>
+                  <td>12 Modul (Statistik, Kelasis, Gereja, Jemaat, Laporan Pelayanan, Dokumen, Ekspor).</td>
+                </tr>
+                <tr>
+                  <td class="td-primary"><span class="badge badge-violet">⛪ Operator Gereja</span></td>
+                  <td class="td-mono">gke.tigi@deiyai.id</td>
+                  <td class="td-mono">operator123</td>
+                  <td>8 Modul (Dashboard gereja, Data Jemaat, Kegiatan Ibadah, Dokumen, Pengumuman).</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="callout-box info">
+            💡 <strong>Langkah Cepat:</strong> Buka <a href="login.html" style="color:var(--gold2)">Halaman Login
+              (login.html)</a>, klik kotak akun demo yang diinginkan, form terisi otomatis, lalu klik tombol
+            <strong>Masuk ke Sistem →</strong>.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Gereja & Foto -->
+      <div class="guide-card" x-show="tab==='all'||tab==='gereja'">
+        <div class="guide-card-head" @click="toggle(2)">
+          <div class="guide-card-title">
+            <span>⛪</span> 2. Manajemen Gereja &amp; Melihat / Mengunggah Foto Gereja
+          </div>
+          <span class="guide-card-badge badge-blue" x-text="openItems[2] ? '▲ Tutup' : '▼ Buka'"></span>
+        </div>
+        <div class="guide-card-body" x-show="openItems[2]" x-transition>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-title">Melihat Banner Foto Gereja (Showcase Detail)</div>
+                <div class="step-desc">Buka menu <strong>Gereja</strong>, klik tombol mata <strong>👁️</strong>. Modal
+                  detail akan menampilkan foto arsitektur gereja beresolusi tinggi dengan informasi nama gembala, tahun
+                  berdiri, jumlah jemaat, dan alamat.</div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-title">Menambahkan Gereja &amp; Unggah Foto</div>
+                <div class="step-desc">Klik tombol <strong>＋ Tambah Gereja</strong>. Masukkan identitas gereja dan pilih
+                  foto gereja dari galeri komputer/HP Anda (maks 2MB). Pratinjau foto akan langsung tampil.</div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <div class="step-title">Penyimpanan Persisten Otomatis</div>
+                <div class="step-desc">Foto otomatis tersimpan permanen di LocalStorage browser dan tidak akan hilang
+                  saat me-refresh halaman.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Data Jemaat -->
+      <div class="guide-card" x-show="tab==='all'||tab==='gereja'">
+        <div class="guide-card-head" @click="toggle(3)">
+          <div class="guide-card-title">
+            <span>👥</span> 3. Manajemen Data Jemaat, Filter &amp; Impor/Ekspor
+          </div>
+          <span class="guide-card-badge badge-teal" x-text="openItems[3] ? '▲ Tutup' : '▼ Buka'"></span>
+        </div>
+        <div class="guide-card-body" x-show="openItems[3]" x-transition>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-title">Pencarian &amp; Penyaringan Multi-Kolom</div>
+                <div class="step-desc">Gunakan filter Kelasis, Status (Aktif / Pindah / Meninggal), Jenis Kelamin, dan
+                  kolom pencarian untuk menemukan jemaat secara instan.</div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-title">Ekspor CSV &amp; Impor JSON</div>
+                <div class="step-desc">Klik tombol <strong>⬇ Export CSV</strong> untuk mengunduh rekap jemaat atau
+                  <strong>⬆ Import Data</strong> untuk memasukkan data massal file JSON.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: Kegiatan -->
+      <div class="guide-card" x-show="tab==='all'||tab==='laporan'">
+        <div class="guide-card-head" @click="toggle(4)">
+          <div class="guide-card-title">
+            <span>📅</span> 4. Pencatatan 9 Jenis Kegiatan Ibadah &amp; Kehadiran
+          </div>
+          <span class="guide-card-badge badge-rose" x-text="openItems[4] ? '▲ Tutup' : '▼ Buka'"></span>
+        </div>
+        <div class="guide-card-body" x-show="openItems[4]" x-transition>
+          <p>Sistem memfasilitasi pencatatan 9 kategori ibadah: <em>Ibadah Minggu, Ibadah Pemuda, Ibadah Wanita, Sekolah
+              Minggu, Baptisan, Pernikahan, Dukacita, Seminar, dan Pelayanan Sosial</em>.</p>
+          <div class="callout-box success">
+            ✓ <strong>Sinkronisasi Grafik:</strong> Setiap penambahan kegiatan otomatis mengupdate diagram batang
+            kegiatan bulanan di Dashboard secara real-time.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Laporan Pelayanan -->
+      <div class="guide-card" x-show="tab==='all'||tab==='laporan'">
+        <div class="guide-card-head" @click="toggle(5)">
+          <div class="guide-card-title">
+            <span>📋</span> 5. Laporan Pelayanan &amp; Alur Persetujuan (Approval)
+          </div>
+          <span class="guide-card-badge badge-lime" x-text="openItems[5] ? '▲ Tutup' : '▼ Buka'"></span>
+        </div>
+        <div class="guide-card-body" x-show="openItems[5]" x-transition>
+          <div class="step-list">
+            <div class="step-item">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <div class="step-title">Pengiriman oleh Admin Kelasis</div>
+                <div class="step-desc">Admin Kelasis mengirimkan laporan bulanan, tahunan, atau kegiatan dengan status
+                  awal <span class="badge badge-amber">⏳ Proses</span>.</div>
+              </div>
+            </div>
+            <div class="step-item">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <div class="step-title">Persetujuan Resmi oleh Super Admin</div>
+                <div class="step-desc">Super Admin memeriksa isi laporan dan mengklik tombol centang hijau
+                  <strong>✓</strong> untuk mengubah status menjadi <span class="badge badge-teal">✓ Diterima</span>.
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: Backup & Restore -->
+      <div class="guide-card" x-show="tab==='all'||tab==='sistem'">
+        <div class="guide-card-head" @click="toggle(6)">
+          <div class="guide-card-title">
+            <span>💾</span> 6. Pencadangan (Backup) &amp; Pemulihan (Restore) Database
+          </div>
+          <span class="guide-card-badge badge-violet" x-text="openItems[6] ? '▲ Tutup' : '▼ Buka'"></span>
+        </div>
+        <div class="guide-card-body" x-show="openItems[6]" x-transition>
+          <p>Pada menu <strong>Pengaturan</strong> (Super Admin), Anda dapat mencadangkan seluruh kelasis, gereja, foto,
+            jemaat, kegiatan, laporan, dan akun ke satu file JSON (<code>Backup_SIMGK_Deiyai_YYYY-MM-DD.json</code>)
+            serta memulihkannya kapan saja via tombol <strong>Restore Backup</strong>.</p>
+        </div>
+      </div>
+
+      <!-- Card 7: FAQ -->
+      <div class="guide-card" x-show="tab==='all'||tab==='sistem'">
+        <div class="guide-card-head" @click="toggle(7)">
+          <div class="guide-card-title">
+            <span>❓</span> 7. Pertanyaan yang Sering Diajukan (FAQ)
+          </div>
+          <span class="guide-card-badge badge-gold" x-text="openItems[7] ? '▲ Tutup' : '▼ Buka'"></span>
+        </div>
+        <div class="guide-card-body" x-show="openItems[7]" x-transition>
+          <div style="display:flex;flex-direction:column;gap:14px">
+            <div>
+              <div style="font-weight:600;color:var(--gold2);margin-bottom:3px">Q: Apakah saya harus login untuk membaca
+                panduan ini?</div>
+              <div style="font-size:12.5px;color:var(--text2)">A: Tidak. Halaman panduan ini dapat dibaca langsung oleh
+                siapa saja dari halaman utama (Landing Page) tanpa perlu login terlebih dahulu.</div>
+            </div>
+            <div>
+              <div style="font-weight:600;color:var(--gold2);margin-bottom:3px">Q: Bagaimana jika saya ingin langsung
+                mencoba aplikasinya?</div>
+              <div style="font-size:12.5px;color:var(--text2)">A: Silakan klik tombol <strong>"🚀 Masuk Sistem
+                  →"</strong> di pojok kanan atas, lalu pilih salah satu dari 3 Akun Demo yang tersedia.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /guide-grid -->
+
+  </div>
+
+  <!-- ══════════════ FOOTER ══════════════ -->
+  <footer class="public-footer">
+    <div style="margin-bottom:6px">
+      © 2026 <strong>SIMGK Deiyai</strong> — Gereja Koordinator Deiyai · Papua Tengah
+    </div>
+    <div>
+      <a href="index.html">Beranda</a> &nbsp;·&nbsp;
+      <a href="login.html">Login</a> &nbsp;·&nbsp;
+      <a href="README.md" target="_blank">Dokumentasi README.md</a>
+    </div>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+</body>
+
+</html>

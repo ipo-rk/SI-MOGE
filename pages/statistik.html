@@ -79,7 +79,9 @@
             <p>Visualisasi data pelayanan Koordinator Deiyai 2024</p>
           </div>
           <div class="page-actions">
-            <button class="btn btn-outline">⬇ Export Laporan</button>
+            <button class="btn btn-outline" @click="exportPDF()">📄 Cetak PDF</button>
+            <button class="btn btn-outline" @click="exportWord()">📝 Word</button>
+            <button class="btn btn-outline" @click="exportData('JSON')">⬇ JSON</button>
           </div>
         </div>
 
@@ -176,6 +178,7 @@
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/logo-data.js"></script>
   <script src="../assets/js/app.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="../assets/js/charts.js"></script>

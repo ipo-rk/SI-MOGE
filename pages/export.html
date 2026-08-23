@@ -4,70 +4,239 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>SIMGK Deiyai — Export Data</title>
+  <title>SIMGK Deiyai — Export Data &amp; Laporan PDF</title>
   <link rel="stylesheet" href="../assets/css/style.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
   <style>
     [x-cloak] {
-      display: none !important
+      display: none !important;
     }
 
-    /* Grid export cards — responsif */
     .export-grid {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
+      gap: 18px;
+      margin-bottom: 24px;
     }
 
-    /* Tablet: 2 kolom */
-    @media (max-width: 900px) {
+    @media (max-width: 960px) {
       .export-grid {
         grid-template-columns: repeat(2, 1fr);
-        gap: 12px;
       }
     }
 
-    /* Mobile: 1 kolom */
-    @media (max-width: 540px) {
+    @media (max-width: 600px) {
       .export-grid {
         grid-template-columns: 1fr;
-        gap: 10px;
       }
     }
 
     .export-card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      padding: 22px 20px;
       display: flex;
       flex-direction: column;
-      align-items: center;
-      text-align: center;
-      padding: 24px 16px;
+      justify-content: space-between;
+      transition: all 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .export-card:hover {
+      border-color: var(--border2);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .export-card-top {
+      display: flex;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 14px;
     }
 
     .export-card-icon {
-      font-size: 38px;
-      margin-bottom: 12px;
-      line-height: 1;
+      width: 48px;
+      height: 48px;
+      border-radius: var(--r-sm);
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      flex-shrink: 0;
     }
 
     .export-card-title {
       font-family: 'Playfair Display', serif;
-      font-size: 15px;
-      font-weight: 600;
+      font-size: 16px;
+      font-weight: 700;
       color: var(--text);
-      margin-bottom: 5px;
+      margin-bottom: 3px;
     }
 
     .export-card-desc {
-      font-size: 11.5px;
+      font-size: 12px;
       color: var(--text3);
+      line-height: 1.5;
+    }
+
+    .export-card-actions {
+      border-top: 1px solid var(--border);
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .export-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .btn-pdf-main {
+      background: linear-gradient(135deg, rgba(200, 160, 32, 0.2) 0%, rgba(200, 160, 32, 0.08) 100%);
+      border: 1px solid var(--gold);
+      color: var(--gold2);
+      font-weight: 600;
+      width: 100%;
+      justify-content: center;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: var(--r-sm);
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-pdf-main:hover {
+      background: var(--gold);
+      color: #09111f;
+      box-shadow: 0 4px 14px rgba(200, 160, 32, 0.35);
+    }
+
+    /* Print Preview Modal Modal Box */
+    .print-preview-modal {
+      width: 820px;
+      max-width: 95vw;
+      max-height: 90vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .print-paper-preview {
+      background: #ffffff;
+      color: #111827;
+      border-radius: 4px;
+      padding: 28px 32px;
+      font-family: 'DM Sans', sans-serif;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+      overflow-y: auto;
+      flex: 1;
+      max-height: 62vh;
+    }
+
+    .paper-kop {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      border-bottom: 3px double #111827;
+      padding-bottom: 14px;
       margin-bottom: 18px;
     }
 
-    .export-card-btns {
+    .paper-kop-logo {
+      font-size: 40px;
+      line-height: 1;
+    }
+
+    .paper-kop-text {
+      flex: 1;
+      text-align: center;
+    }
+
+    .paper-kop-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 19px;
+      font-weight: 800;
+      color: #111827;
+      letter-spacing: 0.5px;
+      margin-bottom: 2px;
+    }
+
+    .paper-kop-sub {
+      font-size: 13px;
+      font-weight: 600;
+      color: #374151;
+      margin-bottom: 3px;
+    }
+
+    .paper-kop-addr {
+      font-size: 10.5px;
+      color: #6b7280;
+    }
+
+    .paper-meta {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      background: #f9fafb;
+      border: 1px solid #e5e7eb;
+      padding: 10px 14px;
+      border-radius: 4px;
+      font-size: 11px;
+      color: #374151;
+      margin-bottom: 16px;
+    }
+
+    .paper-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 12px 0;
+      font-size: 11px;
+    }
+
+    .paper-table th {
+      background: #f3f4f6;
+      border: 1px solid #374151;
+      padding: 6px 8px;
+      font-weight: 700;
+      text-align: left;
+      color: #111827;
+    }
+
+    .paper-table td {
+      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      color: #1f2937;
+    }
+
+    .paper-table tr:nth-child(even) td {
+      background: #f9fafb;
+    }
+
+    .paper-sign-grid {
       display: flex;
-      gap: 7px;
-      justify-content: center;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      margin-top: 35px;
+      padding-top: 10px;
+    }
+
+    .paper-sign-box {
+      text-align: center;
+      width: 200px;
+      font-size: 11px;
+      color: #111827;
+    }
+
+    .paper-sign-space {
+      height: 55px;
     }
   </style>
 </head>
@@ -79,26 +248,258 @@
 
       <main class="page-content" x-data="exportPage">
 
+        <!-- Page Header -->
         <div class="page-header">
           <div class="page-title-block">
-            <h2>Export Data</h2>
-            <p>Download data dalam format PDF, Excel, atau CSV</p>
+            <h2>Export Data &amp; Laporan PDF</h2>
+            <p>Pusat ekspor data pelayanan, format spreadsheet (CSV, Excel), dan pencetakan dokumen PDF resmi</p>
+          </div>
+          <div class="page-actions">
+            <button class="btn btn-outline" @click="openPDFPreview('Statistik Pelayanan')">📊 Cetak Ringkasan
+              PDF</button>
           </div>
         </div>
 
-        <div class="export-grid">
-          <template x-for="e in exports" :key="e.title">
-            <div class="card export-card">
-              <div class="export-card-icon" x-text="e.icon"></div>
-              <div class="export-card-title" x-text="e.title"></div>
-              <div class="export-card-desc" x-text="e.desc"></div>
-              <div class="export-card-btns">
-                <template x-for="f in e.formats" :key="f">
-                  <button class="btn btn-outline btn-sm" @click="doExport(e.title, f)" x-text="f"></button>
+        <!-- Filter Wilayah Toolbar -->
+        <div class="toolbar" style="margin-bottom:20px;justify-content:space-between;flex-wrap:wrap;gap:12px">
+          <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+            <div style="display:flex;align-items:center;gap:8px">
+              <span style="font-size:12px;color:var(--text3);font-weight:600">WILAYAH:</span>
+              <select class="input-select" style="width:220px;padding:6px 12px;font-size:12.5px" x-model="filterKelasis">
+                <option value="all">🌐 Seluruh Wilayah (6 Kelasis)</option>
+                <template x-for="k in kelasisList" :key="k">
+                  <option :value="k" x-text="'Kelasis ' + k"></option>
                 </template>
+              </select>
+            </div>
+            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--text);background:var(--surface);padding:6px 14px;border-radius:var(--r-sm);border:1px solid var(--border);user-select:none">
+              <input type="checkbox" x-model="includeStats" style="accent-color:var(--gold);width:15px;height:15px">
+              <span>📊 <strong>Sertakan Tabel Statistik</strong></span>
+            </label>
+          </div>
+          <div style="font-size:12px;color:var(--text3)">
+            Status: <strong style="color:var(--gold2)"
+              x-text="filterKelasis === 'all' ? 'Semua 6 Kelasis Deiyai' : 'Kelasis ' + filterKelasis"></strong>
+            <span x-show="includeStats" style="color:var(--teal);margin-left:6px">(+ Statistik Aktif)</span>
+          </div>
+        </div>
+
+        <!-- Export Cards Grid -->
+        <div class="export-grid">
+          <template x-for="e in exports" :key="e.id">
+            <div class="export-card">
+              <div>
+                <div class="export-card-top">
+                  <div class="export-card-icon" x-text="e.icon"></div>
+                  <div>
+                    <div class="export-card-title" x-text="e.title"></div>
+                    <div class="export-card-desc" x-text="e.desc"></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="export-card-actions">
+                <!-- Main PDF Button -->
+                <button class="btn-pdf-main" @click="openPDFPreview(e.title)">
+                  <span>📄</span> Cetak Laporan PDF Resmi
+                </button>
+                <!-- Other formats -->
+                <div class="export-btn-group">
+                  <template x-for="f in e.formats.filter(fmt => fmt !== 'PDF')" :key="f">
+                    <button class="btn btn-outline btn-sm" style="flex:1;justify-content:center"
+                      @click="doExport(e.title, f)" x-text="f"></button>
+                  </template>
+                </div>
               </div>
             </div>
           </template>
+        </div>
+
+        <!-- ═══════════════════════════════════════════════════════
+             MODAL: PRATINJAU DOKUMEN PDF RESMI
+        ═══════════════════════════════════════════════════════ -->
+        <div class="modal-backdrop" x-show="printModal" x-cloak @click.self="printModal=false">
+          <div class="modal-box print-preview-modal" x-show="printModal" x-transition>
+
+            <div class="modal-head">
+              <div class="modal-head-title" style="display:flex;align-items:center;gap:8px">
+                <span>📄</span> Pratinjau Dokumen PDF Resmi
+              </div>
+              <button class="modal-close" @click="printModal=false">&#10005;</button>
+            </div>
+
+            <div class="modal-body" style="padding:16px;background:var(--bg3)">
+
+              <!-- Opsi Tambahan Statistik -->
+              <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(200,160,32,0.12);padding:10px 16px;border-radius:6px;margin-bottom:14px;border:1px solid rgba(200,160,32,0.35);font-size:12.5px;flex-wrap:wrap;gap:8px">
+                <span style="color:var(--gold2);font-weight:600;display:flex;align-items:center;gap:6px">
+                  <span>⚙️</span> Opsi Format Dokumen:
+                </span>
+                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);user-select:none">
+                  <input type="checkbox" x-model="includeStats" style="accent-color:var(--gold);width:16px;height:16px">
+                  <span>📊 <strong>Tampilkan &amp; Unduh Bagian Statistik Pelayanan Wilayah</strong></span>
+                </label>
+              </div>
+
+              <!-- Paper Preview Container -->
+              <div class="print-paper-preview print-document" id="printableReport">
+
+                <!-- Kop Surat Resmi -->
+                <div class="paper-kop print-kop">
+                  <div class="paper-kop-logo print-kop-logo" style="display:flex;align-items:center;justify-content:center;"><img src="../assets/img/logo.png" alt="Logo Sinode KINGMI Papua" style="width:75px;height:75px;object-fit:contain;"></div>
+                  <div class="paper-kop-text print-kop-text">
+                    <div class="paper-kop-title print-kop-title">SINODE GEREJA KEMAH INJIL (KINGMI) DI TANAH PAPUA</div>
+                    <div class="paper-kop-sub print-kop-sub">BADAN PEKERJA KOORDINATOR PELAYANAN GEREJA · PAPUA TENGAH
+                    </div>
+                    <div class="paper-kop-addr print-kop-addr">Sekretariat: Jl. Trans Papua, Waghete, Distrik Tigi,
+                      Kabupaten Deiyai, Papua Tengah 98751</div>
+                  </div>
+                </div>
+
+                <!-- Judul Laporan -->
+                <div style="text-align:center;margin-bottom:14px">
+                  <div
+                    style="font-family:'Playfair Display',serif;font-size:15px;font-weight:800;text-decoration:underline;color:#111827;text-transform:uppercase"
+                    x-text="printReport.title"></div>
+                  <div style="font-size:11px;color:#4b5563;margin-top:2px"
+                    x-text="'No. Registrasi: ' + printReport.docNo"></div>
+                </div>
+
+                <!-- Meta Box -->
+                <div class="paper-meta print-meta-grid">
+                  <div><strong>Cakupan Wilayah:</strong> <span x-text="printReport.kelasis"></span></div>
+                  <div><strong>Tanggal Penerbitan:</strong> <span x-text="printReport.date"></span></div>
+                  <div><strong>Total Rekam Data:</strong> <span x-text="printReport.total + ' Baris Tercatat'"></span>
+                  </div>
+                  <div><strong>Otoritas Sistem:</strong> SIMGK Deiyai v3.5 (Tervalidasi)</div>
+                </div>
+
+                <!-- Data Table -->
+                <div style="overflow-x:auto">
+                  <table class="paper-table data-table">
+                    <thead>
+                      <tr>
+                        <template x-for="h in printReport.headers" :key="h">
+                          <th x-text="h"></th>
+                        </template>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="(row, rIdx) in printReport.rows" :key="rIdx">
+                        <tr>
+                          <template x-for="(cell, cIdx) in row" :key="cIdx">
+                            <td x-text="cell"></td>
+                          </template>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- Bagian 2: Ringkasan Statistik & Visual Grafik (Dinamis Sesuai Pilihan) -->
+                <div x-show="includeStats" style="margin-top:20px;border-top:1.5px solid #d1d5db;padding-top:14px">
+                  
+                  <!-- Judul Bagian Statistik -->
+                  <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:800;color:#111827;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
+                    <span>📊</span> Ringkasan Statistik Pelayanan Wilayah
+                  </div>
+
+                  <!-- Tabel Metrik Statistik -->
+                  <table class="paper-table data-table" style="margin-bottom:18px">
+                    <thead>
+                      <tr>
+                        <th style="width:35%">Indikator Pelayanan</th>
+                        <th style="width:30%">Jumlah / Angka Terdata</th>
+                        <th style="width:35%">Keterangan &amp; Analisis</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="(sRow, sIdx) in getStatsRows()" :key="sIdx">
+                        <tr>
+                          <td style="font-weight:600" x-text="sRow[0]"></td>
+                          <td x-text="sRow[1]"></td>
+                          <td style="color:#4b5563" x-text="sRow[2]"></td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+
+                  <!-- Visual Grafik Distribusi Pelayanan per Kelasis -->
+                  <div style="font-family:'Playfair Display',serif;font-size:12.5px;font-weight:800;color:#111827;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
+                    <span>📈</span> Grafik Visual Distribusi Jemaat &amp; Gereja per Kelasis
+                  </div>
+                  <table class="paper-table data-table">
+                    <thead>
+                      <tr>
+                        <th style="width:25%">Wilayah Kelasis</th>
+                        <th style="width:38%">Grafik Sebaran Jemaat</th>
+                        <th style="width:37%">Grafik Sebaran Gereja &amp; Pelayan</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <template x-for="(cRow, cIdx) in getChartVisualRows()" :key="cIdx">
+                        <tr>
+                          <td style="font-weight:700" x-text="cRow.nama"></td>
+                          <td>
+                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#854d0e;margin-bottom:2px">
+                              <span x-text="cRow.jemaat.toLocaleString('id') + ' Jiwa'"></span>
+                              <span x-text="cRow.jPct + '%'"></span>
+                            </div>
+                            <div style="background:#e5e7eb;height:8px;border-radius:4px;overflow:hidden">
+                              <div style="background:#c8a020;height:100%;border-radius:4px" :style="'width:' + cRow.jPct + '%'"></div>
+                            </div>
+                          </td>
+                          <td>
+                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#1e40af;margin-bottom:2px">
+                              <span x-text="cRow.gereja + ' Gereja (' + cRow.pendeta + ' Pendeta)'"></span>
+                              <span x-text="cRow.gPct + '%'"></span>
+                            </div>
+                            <div style="background:#e5e7eb;height:8px;border-radius:4px;overflow:hidden">
+                              <div style="background:#3b82f6;height:100%;border-radius:4px" :style="'width:' + cRow.gPct + '%'"></div>
+                            </div>
+                          </td>
+                        </tr>
+                      </template>
+                    </tbody>
+                  </table>
+
+                </div>
+
+                <!-- Tanda Tangan Resmi -->
+                <div class="paper-sign-grid print-signature-box">
+                  <div class="paper-sign-box print-sign-item">
+                    <div>Mengetahui,</div>
+                    <div style="font-weight:600">Ketua Koordinator Deiyai</div>
+                    <div class="paper-sign-space print-sign-space"></div>
+                    <div class="print-sign-name">Pdt. Samuel Pakage, S.Th</div>
+                    <div style="font-size:10px;color:#6b7280">NIP/Reg: 19820412.200801.1.002</div>
+                  </div>
+
+                  <div class="paper-sign-box print-sign-item">
+                    <div>Deiyai, <span x-text="printReport.date"></span></div>
+                    <div style="font-weight:600">Sekretaris Pelayanan</div>
+                    <div class="paper-sign-space print-sign-space"></div>
+                    <div class="print-sign-name">Pnt. Yohanes Gobai</div>
+                    <div style="font-size:10px;color:#6b7280">NIP/Reg: 19870619.201202.1.004</div>
+                  </div>
+                </div>
+
+              </div><!-- /print-paper-preview -->
+
+            </div>
+
+            <div class="modal-foot" style="justify-content:space-between;flex-wrap:wrap;gap:10px">
+              <span style="font-size:12px;color:var(--text3)">💡 Tips: Pilih opsi <em>Save as PDF</em> pada dialog cetak
+                untuk menyimpan file PDF.</span>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost" @click="printModal=false">Tutup</button>
+                <button class="btn btn-outline" @click="doExport(printReport.title, 'Word')">📝 Unduh Word
+                  (.doc)</button>
+                <button class="btn btn-primary" @click="printNow()">🖨️ Cetak / Simpan PDF</button>
+              </div>
+            </div>
+
+          </div>
         </div>
 
       </main>
@@ -106,6 +507,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/logo-data.js"></script>
   <script src="../assets/js/app.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
@@ -117,7 +519,7 @@
       } catch (e) { window.location.href = 'dashboard.html'; }
     })();
     document.addEventListener('DOMContentLoaded', function () {
-      buildLayout('export', 'Export Data', 'Export');
+      buildLayout('export', 'Export Data & Laporan PDF', 'Export');
     });
   </script>
 </body>

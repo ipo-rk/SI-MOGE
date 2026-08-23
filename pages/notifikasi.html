@@ -38,7 +38,8 @@
               </div>
             </template>
             <template x-for="n in items" :key="n.id">
-              <div class="notif-item" :class="{unread:!n.read}" @click="n.read=true" style="cursor:pointer">
+              <div class="notif-item" :class="{unread:!n.read}" @click="n.read=true; Alpine.store('data').persist()"
+                style="cursor:pointer">
                 <div class="notif-dot" :style="'background:'+n.color"></div>
                 <div class="notif-body">
                   <h4 x-text="n.title"></h4>
@@ -60,6 +61,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.js"></script>
+  <script src="../assets/js/logo-data.js"></script>
   <script src="../assets/js/app.js"></script>
   <script src="../assets/js/layout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js" defer></script>

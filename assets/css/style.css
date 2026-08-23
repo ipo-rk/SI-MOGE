@@ -1853,3 +1853,155 @@ body {
     padding: 10px 14px;
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   OFFICIAL PDF & PRINT STYLING
+══════════════════════════════════════════════════════════════ */
+@media print {
+  /* Sembunyikan elemen navigasi dan antarmuka non-cetak */
+  .app-sidebar,
+  .app-header,
+  .sidebar-overlay,
+  .page-header .page-actions,
+  .toolbar,
+  .guide-tabs,
+  .btn,
+  button,
+  .modal-backdrop,
+  .fab-container,
+  .fab-backdrop {
+    display: none !important;
+  }
+
+  body,
+  .app-layout,
+  .main-area,
+  .page-content {
+    background: #ffffff !important;
+    color: #111827 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: "DM Sans", Arial, sans-serif !important;
+    font-size: 10pt !important;
+    width: 100% !important;
+  }
+
+  .card {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  /* Area Dokumen Resmi untuk Cetak PDF */
+  .print-document {
+    display: block !important;
+    background: #ffffff !important;
+    color: #111827 !important;
+    padding: 10px 20px !important;
+  }
+
+  .print-kop {
+    display: flex !important;
+    align-items: center;
+    gap: 16px;
+    border-bottom: 3px double #111827 !important;
+    padding-bottom: 12px !important;
+    margin-bottom: 18px !important;
+    text-align: center;
+  }
+
+  .print-kop-logo {
+    font-size: 36pt !important;
+    line-height: 1;
+  }
+
+  .print-kop-text {
+    flex: 1;
+    text-align: center;
+  }
+
+  .print-kop-title {
+    font-family: "Playfair Display", serif !important;
+    font-size: 16pt !important;
+    font-weight: 800 !important;
+    color: #111827 !important;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+  }
+
+  .print-kop-sub {
+    font-size: 11pt !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+    margin-bottom: 4px;
+  }
+
+  .print-kop-addr {
+    font-size: 8.5pt !important;
+    color: #4b5563 !important;
+  }
+
+  .print-meta-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 16px !important;
+    font-size: 9pt !important;
+    color: #374151 !important;
+    background: #f9fafb !important;
+    padding: 8px 12px !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 4px;
+  }
+
+  .data-table {
+    border-collapse: collapse !important;
+    width: 100% !important;
+    margin: 12px 0 !important;
+    border: 1px solid #374151 !important;
+  }
+
+  .data-table th {
+    background: #f3f4f6 !important;
+    color: #111827 !important;
+    border: 1px solid #374151 !important;
+    font-weight: 700 !important;
+    padding: 6px 8px !important;
+    font-size: 8.5pt !important;
+    text-align: left !important;
+  }
+
+  .data-table td {
+    border: 1px solid #d1d5db !important;
+    color: #1f2937 !important;
+    padding: 5px 8px !important;
+    font-size: 8.5pt !important;
+  }
+
+  .data-table tr:nth-child(even) td {
+    background: #f9fafb !important;
+  }
+
+  .print-signature-box {
+    display: flex !important;
+    justify-content: space-between;
+    margin-top: 35px !important;
+    page-break-inside: avoid;
+  }
+
+  .print-sign-item {
+    text-align: center;
+    width: 200px;
+    font-size: 9pt !important;
+  }
+
+  .print-sign-space {
+    height: 60px;
+  }
+
+  .print-sign-name {
+    font-weight: 700 !important;
+    text-decoration: underline;
+  }
+}
