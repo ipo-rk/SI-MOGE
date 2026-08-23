@@ -10,6 +10,7 @@
     href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
     rel="stylesheet">
   <link rel="stylesheet" href="assets/css/style.css">
+  <script src="assets/js/logo-data.js"></script>
   <style>
     [x-cloak] {
       display: none !important;
@@ -397,7 +398,11 @@
   <!-- ══════════════ NAVBAR PUBLIK ══════════════ -->
   <nav class="public-navbar">
     <a href="index.html" class="public-logo">
-      <div class="public-logo-mark" style="background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;"><img src="assets/img/logo.png" alt="Logo Sinode KINGMI Papua" style="width:38px;height:38px;object-fit:contain;"></div>
+      <div class="public-logo-mark"
+        style="background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;"><img
+          src="assets/img/logo.png" alt="Logo Sinode KINGMI Papua" style="width:38px;height:38px;object-fit:contain;"
+          onerror="this.onerror=null; if(typeof SIMGK_LOGO_BASE64!=='undefined'&&SIMGK_LOGO_BASE64){this.src=SIMGK_LOGO_BASE64;}">
+      </div>
       <div>
         <div class="public-logo-title">SIMGK Deiyai</div>
         <div class="public-logo-sub">Panduan Penggunaan Sistem</div>
@@ -587,7 +592,8 @@
               <div class="step-content">
                 <div class="step-title">Ekspor CSV &amp; Impor JSON</div>
                 <div class="step-desc">Klik tombol <strong>⬇ Export CSV</strong> untuk mengunduh rekap jemaat atau
-                  <strong>⬆ Import Data</strong> untuk memasukkan data massal file JSON.</div>
+                  <strong>⬆ Import Data</strong> untuk memasukkan data massal file JSON.
+                </div>
               </div>
             </div>
           </div>

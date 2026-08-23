@@ -203,15 +203,21 @@ ${meta.chartRows && meta.chartRows.length ? `
         <td style="border:1px solid #d1d5db;padding:6px 10px;font-family:Arial,sans-serif;font-size:9.5pt;font-weight:bold;color:#111827;">${cr.nama}</td>
         <td style="border:1px solid #d1d5db;padding:6px 10px;font-family:Arial,sans-serif;font-size:9.5pt;color:#1f2937;">
           <div style="font-weight:bold;color:#c8a020;">${cr.jemaat.toLocaleString('id')} Jiwa (${cr.jPct}%)</div>
-          <div style="background-color:#e5e7eb;height:7px;width:100%;border-radius:3px;margin-top:3px;">
-            <div style="background-color:#c8a020;height:7px;width:${cr.jPct}%;border-radius:3px;"></div>
-          </div>
+          <table cellspacing="0" cellpadding="0" style="width:100%;height:7px;border-collapse:collapse;margin-top:3px;">
+            <tr>
+              <td width="${cr.jPct}%" bgcolor="#c8a020" style="background-color:#c8a020;height:7px;line-height:7px;font-size:1px;">&nbsp;</td>
+              <td width="${100 - cr.jPct}%" bgcolor="#e5e7eb" style="background-color:#e5e7eb;height:7px;line-height:7px;font-size:1px;">&nbsp;</td>
+            </tr>
+          </table>
         </td>
         <td style="border:1px solid #d1d5db;padding:6px 10px;font-family:Arial,sans-serif;font-size:9.5pt;color:#1f2937;">
           <div><strong>${cr.gereja} Gereja</strong> &nbsp;·&nbsp; ${cr.pendeta} Pendeta/Pelayan</div>
-          <div style="background-color:#e5e7eb;height:7px;width:100%;border-radius:3px;margin-top:3px;">
-            <div style="background-color:#3478d5;height:7px;width:${cr.gPct}%;border-radius:3px;"></div>
-          </div>
+          <table cellspacing="0" cellpadding="0" style="width:100%;height:7px;border-collapse:collapse;margin-top:3px;">
+            <tr>
+              <td width="${cr.gPct}%" bgcolor="#3478d5" style="background-color:#3478d5;height:7px;line-height:7px;font-size:1px;">&nbsp;</td>
+              <td width="${100 - cr.gPct}%" bgcolor="#e5e7eb" style="background-color:#e5e7eb;height:7px;line-height:7px;font-size:1px;">&nbsp;</td>
+            </tr>
+          </table>
         </td>
       </tr>`;
     }).join('')}
@@ -311,8 +317,8 @@ ${meta.statsRows && meta.statsRows.length ? `
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap">
   <style>
     @page { size: A4 portrait; margin: 15mm 12mm 15mm 12mm; }
-    * { box-sizing: border-box; }
-    body { font-family: 'DM Sans', Arial, sans-serif; color: #111827; margin: 0; padding: 0; background: #ffffff; font-size: 9.5pt; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    * { box-sizing: border-box; -webkit-print-color-adjust: exact !important; color-adjust: exact !important; print-color-adjust: exact !important; }
+    body { font-family: 'DM Sans', Arial, sans-serif; color: #111827; margin: 0; padding: 0; background: #ffffff; font-size: 9.5pt; }
     .paper-kop, .print-kop { display: flex; align-items: center; gap: 14px; border-bottom: 3px double #111827; padding-bottom: 12px; margin-bottom: 16px; text-align: center; }
     .paper-kop-logo, .print-kop-logo { width: 75px; height: 75px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
     .paper-kop-logo img, .print-kop-logo img { width: 75px; height: 75px; object-fit: contain; }
@@ -329,6 +335,14 @@ ${meta.statsRows && meta.statsRows.length ? `
     .paper-sign-box, .print-sign-item { text-align: center; width: 200px; font-size: 8.5pt; }
     .paper-sign-space, .print-sign-space { height: 50px; }
     .print-sign-name { font-weight: 700; text-decoration: underline; }
+    /* Bar persentase (progress bar) dinamis — dipakai baik dari
+       export.html (rep.innerHTML) maupun dari printReport() di app.js.
+       !important memastikan warnanya tetap tercetak walau opsi
+       "Background graphics" di dialog print browser tidak dicentang. */
+    .pct-bar-track { background: #e5e7eb !important; height: 8px; border-radius: 4px; overflow: hidden; }
+    .pct-bar-fill { height: 100% !important; border-radius: 4px; }
+    .pct-bar-fill.gold { background: #c8a020 !important; }
+    .pct-bar-fill.blue { background: #3478d5 !important; }
   </style>
 </head>
 <body>
@@ -417,6 +431,63 @@ ${meta.statsRows && meta.statsRows.length ? `
         <thead><tr>${tableHeaders}</tr></thead>
         <tbody>${tableRows}</tbody>
       </table>
+
+      ${meta.chartRows && meta.chartRows.length ? `
+      <div style="margin-top:20px;margin-bottom:8px;">
+        <div style="font-family:'Playfair Display',serif;font-size:12.5px;font-weight:800;color:#111827;text-transform:uppercase;border-bottom:1.5px solid #111827;padding-bottom:3px;">
+          📈 Grafik Visual Distribusi Jemaat &amp; Gereja per Kelasis
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:25%">Wilayah Kelasis</th>
+            <th style="width:38%">Grafik Sebaran Jemaat</th>
+            <th style="width:37%">Grafik Sebaran Gereja &amp; Pelayan</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${meta.chartRows.map(cr => `
+          <tr>
+            <td style="font-weight:700;">${cr.nama}</td>
+            <td>
+              <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#854d0e;margin-bottom:2px;">
+                <span>${cr.jemaat.toLocaleString('id')} Jiwa</span>
+                <span>${cr.jPct}%</span>
+              </div>
+              <div class="pct-bar-track"><div class="pct-bar-fill gold" style="width:${cr.jPct}%;"></div></div>
+            </td>
+            <td>
+              <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#1e40af;margin-bottom:2px;">
+                <span>${cr.gereja} Gereja (${cr.pendeta} Pendeta)</span>
+                <span>${cr.gPct}%</span>
+              </div>
+              <div class="pct-bar-track"><div class="pct-bar-fill blue" style="width:${cr.gPct}%;"></div></div>
+            </td>
+          </tr>`).join('')}
+        </tbody>
+      </table>
+      ` : ''}
+
+      ${meta.statsRows && meta.statsRows.length ? `
+      <div style="margin-top:20px;margin-bottom:8px;">
+        <div style="font-family:'Playfair Display',serif;font-size:12.5px;font-weight:800;color:#111827;text-transform:uppercase;border-bottom:1.5px solid #111827;padding-bottom:3px;">
+          📊 Ringkasan Statistik Pelayanan Wilayah
+        </div>
+      </div>
+      <table class="data-table">
+        <thead>
+          <tr>
+            <th style="width:35%">Indikator Pelayanan</th>
+            <th style="width:30%">Jumlah / Angka Terdata</th>
+            <th style="width:35%">Keterangan &amp; Analisis</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${meta.statsRows.map(sr => `<tr><td style="font-weight:600;">${sr[0]}</td><td>${sr[1]}</td><td style="color:#4b5563;">${sr[2]}</td></tr>`).join('')}
+        </tbody>
+      </table>
+      ` : ''}
 
       <div class="print-signature-box">
         <div class="print-sign-item">
