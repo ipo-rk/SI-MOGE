@@ -5,6 +5,41 @@
  * ============================================================
  */
 
+/* ── Auto-load logo-data.js jika belum dimuat oleh halaman ──
+   Beberapa halaman mungkin lupa menyertakan <script src="logo-data.js">
+   sebelum app.js. Guard ini memastikan SIMGK_LOGO_BASE64 selalu
+   tersedia sebelum fitur print/export logo dijalankan, sehingga
+   tidak lagi bergantung pada file assets/img/logo.png yang hilang. */
+(function ensureLogoData() {
+  if (typeof window.SIMGK_LOGO_BASE64 !== 'undefined' && window.SIMGK_LOGO_BASE64) return;
+  if (document.getElementById('simgk-logo-data-autoload')) return;
+  var inPages = window.location.pathname.includes('/pages/');
+  var src = inPages ? '../assets/js/logo-data.js' : 'assets/js/logo-data.js';
+  var s = document.createElement('script');
+  s.id = 'simgk-logo-data-autoload';
+  s.src = src;
+  document.head.appendChild(s);
+})();
+
+/* Menunggu SIMGK_LOGO_BASE64 siap (maks ~1.5 detik) sebelum print/export
+   dijalankan, untuk menghindari race condition saat auto-load di atas
+   belum selesai ketika tombol print/export langsung diklik. */
+function waitForLogoData(timeoutMs = 1500) {
+  return new Promise((resolve) => {
+    if (typeof window.SIMGK_LOGO_BASE64 !== 'undefined' && window.SIMGK_LOGO_BASE64) {
+      resolve();
+      return;
+    }
+    const start = Date.now();
+    const iv = setInterval(() => {
+      if ((typeof window.SIMGK_LOGO_BASE64 !== 'undefined' && window.SIMGK_LOGO_BASE64) || Date.now() - start > timeoutMs) {
+        clearInterval(iv);
+        resolve();
+      }
+    }, 50);
+  });
+}
+
 /* ── SweetAlert2 helper wrappers ── */
 const Swal2 = {
   confirm(title, text, icon = 'warning') {
@@ -74,7 +109,8 @@ const FileUtil = {
     const jsonStr = JSON.stringify(data, null, 2);
     this.downloadBlob(filename, jsonStr, 'application/json;charset=utf-8;');
   },
-  exportWord(filename, title, headers, rows, meta = {}) {
+  async exportWord(filename, title, headers, rows, meta = {}) {
+    await waitForLogoData();
     const now = new Date();
     const dateStr = meta.date || now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     const docNo = meta.docNo || ('SIMGK/DOC-' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + '/' + Math.floor(1000 + Math.random() * 9000));
@@ -230,7 +266,8 @@ ${meta.statsRows && meta.statsRows.length ? `
 
     this.downloadBlob(filename, wordContent, 'application/msword;charset=utf-8;');
   },
-  printHTML(htmlContent) {
+  async printHTML(htmlContent) {
+    await waitForLogoData();
     const inPages = window.location.pathname.includes('/pages/');
     const baseHref = inPages ? '../' : './';
     const logoSrc = (typeof SIMGK_LOGO_BASE64 !== 'undefined' && SIMGK_LOGO_BASE64) ? SIMGK_LOGO_BASE64 : (inPages ? '../assets/img/logo.png' : 'assets/img/logo.png');
@@ -303,7 +340,7 @@ ${meta.statsRows && meta.statsRows.length ? `
     });
   },
 
-  printReport(title, headers, rows, meta = {}) {
+  async printReport(title, headers, rows, meta = {}) {
     const now = new Date();
     const dateStr = meta.date || now.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' });
     const docNo = meta.docNo || ('SIMGK/DOC-' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + '/' + Math.floor(1000 + Math.random() * 9000));
@@ -364,7 +401,7 @@ ${meta.statsRows && meta.statsRows.length ? `
     `;
 
     Swal2.toast('Menyiapkan dokumen PDF...', 'info');
-    this.printHTML(htmlContent);
+    await this.printHTML(htmlContent);
   }
 };
 
