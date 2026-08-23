@@ -7,21 +7,21 @@
 
 /* ── Global Chart Defaults ── */
 const C = {
-  gold:   '#c8a020',
-  gold2:  '#e6bb3c',
-  blue:   '#3478d5',
-  blue2:  '#5a9bf0',
-  teal:   '#16b89a',
-  rose:   '#dd5566',
+  gold: '#c8a020',
+  gold2: '#e6bb3c',
+  blue: '#3478d5',
+  blue2: '#5a9bf0',
+  teal: '#16b89a',
+  rose: '#dd5566',
   violet: '#8a6cf0',
-  lime:   '#3dcf6e',
-  amber:  '#e8943a',
-  text:   '#dce5f2',
-  text2:  '#8fa8c8',
-  text3:  '#506278',
+  lime: '#3dcf6e',
+  amber: '#e8943a',
+  text: '#dce5f2',
+  text2: '#8fa8c8',
+  text3: '#506278',
   border: '#1f2e44',
-  bg2:    '#0d1828',
-  surface:'#172234',
+  bg2: '#0d1828',
+  surface: '#172234',
 };
 
 const PALLETE = [C.gold, C.blue2, C.teal, C.violet, C.rose, C.lime, C.amber];
@@ -45,7 +45,7 @@ const tooltipPlugin = {
   padding: 11,
   cornerRadius: 8,
   titleFont: { family: "'Playfair Display', serif", size: 13 },
-  bodyFont:  { family: "'DM Sans', sans-serif",     size: 12 },
+  bodyFont: { family: "'DM Sans', sans-serif", size: 12 },
   displayColors: true,
   boxWidth: 10,
   boxHeight: 10,
@@ -65,11 +65,11 @@ const legendPlugin = {
 const scalesXY = {
   x: {
     ticks: { color: C.text3, font: { family: "'DM Sans', sans-serif", size: 11 } },
-    grid:  { color: 'rgba(31,46,68,0.7)', drawBorder: false },
+    grid: { color: 'rgba(31,46,68,0.7)', drawBorder: false },
   },
   y: {
     ticks: { color: C.text3, font: { family: "'DM Sans', sans-serif", size: 11 } },
-    grid:  { color: 'rgba(31,46,68,0.7)', drawBorder: false },
+    grid: { color: 'rgba(31,46,68,0.7)', drawBorder: false },
   },
 };
 
@@ -84,14 +84,14 @@ function getStore() {
     if (window.Alpine && Alpine.store && Alpine.store('data')) {
       return Alpine.store('data');
     }
-  } catch (e) {}
+  } catch (e) { }
   return null;
 }
 
 /* ─────────────────────────────────────────────────
    DASHBOARD CHARTS
 ───────────────────────────────────────────────── */
-window.initDashboardCharts = function() {
+window.initDashboardCharts = function () {
   const el1 = document.getElementById('chart-kegiatan');
   const el2 = document.getElementById('chart-kelasis-donut');
   if (!el1 && !el2) return;
@@ -103,7 +103,7 @@ window.initDashboardCharts = function() {
     Chart.getChart(el1)?.destroy();
 
     // Generate month dynamic counts from actual store.kegiatan if available
-    const months = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agt','Sep','Okt','Nov','Des'];
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agt', 'Sep', 'Okt', 'Nov', 'Des'];
     const monthlyCounts = [14, 18, 22, 16, 20, 24, 28, 19, 21, 26, 30, 14];
     if (store && store.kegiatan) {
       // Aggregate real activities into current month if present
@@ -146,7 +146,7 @@ window.initDashboardCharts = function() {
   if (el2) {
     Chart.getChart(el2)?.destroy();
 
-    let labels = ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'];
+    let labels = ['Tigi', 'Tigi Barat', 'Yatamo', 'Wagamo', 'Tigi Utara', 'Debey'];
     let values = [9, 8, 7, 8, 9, 7];
 
     if (store && store.kelasis && store.kelasis.length > 0) {
@@ -187,15 +187,15 @@ window.initDashboardCharts = function() {
 /* ─────────────────────────────────────────────────
    STATISTIK PAGE CHARTS
 ───────────────────────────────────────────────── */
-window.initStatCharts = function() {
-  const ids = ['chart-growth','chart-pie-jemaat','chart-bar-kelasis','chart-stat-donut'];
+window.initStatCharts = function () {
+  const ids = ['chart-growth', 'chart-pie-jemaat', 'chart-bar-kelasis', 'chart-stat-donut'];
   ids.forEach(id => {
     const el = document.getElementById(id);
     if (el) Chart.getChart(el)?.destroy();
   });
 
   const store = getStore();
-  let kelasisLabels = ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'];
+  let kelasisLabels = ['Tigi', 'Tigi Barat', 'Yatamo', 'Wagamo', 'Tigi Utara', 'Debey'];
   let jemaatValues = [724, 612, 543, 684, 701, 583];
 
   if (store && store.kelasis && store.kelasis.length > 0) {
@@ -209,12 +209,12 @@ window.initStatCharts = function() {
     new Chart(elG.getContext('2d'), {
       type: 'line',
       data: {
-        labels: ['2020','2021','2022','2023','2024'],
+        labels: ['2020', '2021', '2022', '2023', '2024'],
         datasets: [
-          { label: kelasisLabels[0] || 'Tigi',       data:[600,640,680,710, jemaatValues[0] || 724], borderColor:C.gold,   backgroundColor:'rgba(200,160,32,0.05)', borderWidth:2.5, tension:0.4, fill:true,  pointBackgroundColor:C.gold,   pointRadius:5, pointBorderColor:C.bg2, pointBorderWidth:2 },
-          { label: kelasisLabels[1] || 'Tigi Barat', data:[520,560,580,600, jemaatValues[1] || 612], borderColor:C.blue2,  backgroundColor:'rgba(90,155,240,0.05)', borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.blue2,  pointRadius:4 },
-          { label: kelasisLabels[3] || 'Wagamo',     data:[600,620,645,665, jemaatValues[3] || 684], borderColor:C.violet, backgroundColor:'transparent',           borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.violet, pointRadius:4 },
-          { label: kelasisLabels[4] || 'Tigi Utara', data:[620,655,675,690, jemaatValues[4] || 701], borderColor:C.rose,   backgroundColor:'transparent',           borderWidth:2,   tension:0.4, fill:false, pointBackgroundColor:C.rose,   pointRadius:4 },
+          { label: kelasisLabels[0] || 'Tigi', data: [600, 640, 680, 710, jemaatValues[0] || 724], borderColor: C.gold, backgroundColor: 'rgba(200,160,32,0.05)', borderWidth: 2.5, tension: 0.4, fill: true, pointBackgroundColor: C.gold, pointRadius: 5, pointBorderColor: C.bg2, pointBorderWidth: 2 },
+          { label: kelasisLabels[1] || 'Tigi Barat', data: [520, 560, 580, 600, jemaatValues[1] || 612], borderColor: C.blue2, backgroundColor: 'rgba(90,155,240,0.05)', borderWidth: 2, tension: 0.4, fill: false, pointBackgroundColor: C.blue2, pointRadius: 4 },
+          { label: kelasisLabels[3] || 'Wagamo', data: [600, 620, 645, 665, jemaatValues[3] || 684], borderColor: C.violet, backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, fill: false, pointBackgroundColor: C.violet, pointRadius: 4 },
+          { label: kelasisLabels[4] || 'Tigi Utara', data: [620, 655, 675, 690, jemaatValues[4] || 701], borderColor: C.rose, backgroundColor: 'transparent', borderWidth: 2, tension: 0.4, fill: false, pointBackgroundColor: C.rose, pointRadius: 4 },
         ],
       },
       options: {
@@ -319,13 +319,13 @@ window.initStatCharts = function() {
 /* ─────────────────────────────────────────────────
    Dashboard Wilayah — Bar sederhana
 ───────────────────────────────────────────────── */
-window.initWilayahChart = function() {
+window.initWilayahChart = function () {
   const el = document.getElementById('chart-wilayah');
   if (!el) return;
   Chart.getChart(el)?.destroy();
 
   const store = getStore();
-  let labels = ['Tigi','Tigi Barat','Yatamo','Wagamo','Tigi Utara','Debey'];
+  let labels = ['Tigi', 'Tigi Barat', 'Yatamo', 'Wagamo', 'Tigi Utara', 'Debey'];
   let values = [724, 612, 543, 684, 701, 583];
 
   if (store && store.kelasis && store.kelasis.length > 0) {

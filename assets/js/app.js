@@ -233,7 +233,7 @@ ${meta.statsRows && meta.statsRows.length ? `
   printHTML(htmlContent) {
     const inPages = window.location.pathname.includes('/pages/');
     const baseHref = inPages ? '../' : './';
-    const logoSrc = inPages ? '../assets/img/logo.png' : 'assets/img/logo.png';
+    const logoSrc = (typeof SIMGK_LOGO_BASE64 !== 'undefined' && SIMGK_LOGO_BASE64) ? SIMGK_LOGO_BASE64 : (inPages ? '../assets/img/logo.png' : 'assets/img/logo.png');
 
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
@@ -292,13 +292,13 @@ ${meta.statsRows && meta.statsRows.length ? `
     };
 
     iframe.contentWindow.onafterprint = () => {
-      try { iframe.remove(); } catch (e) {}
+      try { iframe.remove(); } catch (e) { }
     };
 
     requestAnimationFrame(() => {
       triggerPrint();
       setTimeout(() => {
-        try { if (iframe.parentNode) iframe.remove(); } catch (e) {}
+        try { if (iframe.parentNode) iframe.remove(); } catch (e) { }
       }, 3000);
     });
   },
@@ -309,7 +309,7 @@ ${meta.statsRows && meta.statsRows.length ? `
     const docNo = meta.docNo || ('SIMGK/DOC-' + now.getFullYear() + String(now.getMonth() + 1).padStart(2, '0') + '/' + Math.floor(1000 + Math.random() * 9000));
     const kText = meta.kelasis || 'Seluruh Wilayah (6 Kelasis Deiyai)';
     const inPages = window.location.pathname.includes('/pages/');
-    const logoSrc = inPages ? '../assets/img/logo.png' : 'assets/img/logo.png';
+    const logoSrc = (typeof SIMGK_LOGO_BASE64 !== 'undefined' && SIMGK_LOGO_BASE64) ? SIMGK_LOGO_BASE64 : (inPages ? '../assets/img/logo.png' : 'assets/img/logo.png');
 
     let tableHeaders = headers.map(h => `<th>${h}</th>`).join('');
     let tableRows = rows.map((r, rIdx) => {
@@ -1979,7 +1979,7 @@ document.addEventListener('alpine:init', () => {
         if (store && typeof store.getChartVisualRows === 'function') {
           return store.getChartVisualRows();
         }
-      } catch (e) {}
+      } catch (e) { }
       return [];
     },
 
@@ -1989,7 +1989,7 @@ document.addEventListener('alpine:init', () => {
         if (store && typeof store.getStatsRows === 'function') {
           return store.getStatsRows(this.filterKelasis);
         }
-      } catch (e) {}
+      } catch (e) { }
 
       const dataStore = Alpine.store('data') || {};
       const kFilter = this.filterKelasis;

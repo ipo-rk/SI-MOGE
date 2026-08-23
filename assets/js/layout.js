@@ -137,9 +137,11 @@ function _createSidebar(activePage, role, user) {
   aside.className = 'sidebar';
   aside.id = 'simgk-sidebar';
 
+  var sidebarLogoSrc = (typeof SIMGK_LOGO_BASE64 !== 'undefined' && SIMGK_LOGO_BASE64) ? SIMGK_LOGO_BASE64 : '../assets/img/logo.png';
+
   aside.innerHTML =
     '<a href="dashboard.html" class="sidebar-logo">'
-    + '<div class="logo-mark" style="background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;"><img src="../assets/img/logo.png" alt="Logo Sinode KINGMI Papua" style="width:34px;height:34px;object-fit:contain;"></div>'
+    + '<div class="logo-mark" style="background:transparent;box-shadow:none;display:flex;align-items:center;justify-content:center;"><img src="' + sidebarLogoSrc + '" alt="Logo Sinode KINGMI Papua" style="width:34px;height:34px;object-fit:contain;" onerror="this.onerror=null;this.src=\'../assets/img/logo.png\';"></div>'
     + '<div class="logo-text"><h1>Sistem Monitoring </h1><p>Koordinator Deiyai - Papua Tengah</p></div>'
     + '</a>'
     + '<nav class="sidebar-nav">' + navHTML + '</nav>'

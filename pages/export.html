@@ -265,14 +265,16 @@
           <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap">
             <div style="display:flex;align-items:center;gap:8px">
               <span style="font-size:12px;color:var(--text3);font-weight:600">WILAYAH:</span>
-              <select class="input-select" style="width:220px;padding:6px 12px;font-size:12.5px" x-model="filterKelasis">
+              <select class="input-select" style="width:220px;padding:6px 12px;font-size:12.5px"
+                x-model="filterKelasis">
                 <option value="all">🌐 Seluruh Wilayah (6 Kelasis)</option>
                 <template x-for="k in kelasisList" :key="k">
                   <option :value="k" x-text="'Kelasis ' + k"></option>
                 </template>
               </select>
             </div>
-            <label style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--text);background:var(--surface);padding:6px 14px;border-radius:var(--r-sm);border:1px solid var(--border);user-select:none">
+            <label
+              style="display:inline-flex;align-items:center;gap:8px;cursor:pointer;font-size:12px;color:var(--text);background:var(--surface);padding:6px 14px;border-radius:var(--r-sm);border:1px solid var(--border);user-select:none">
               <input type="checkbox" x-model="includeStats" style="accent-color:var(--gold);width:15px;height:15px">
               <span>📊 <strong>Sertakan Tabel Statistik</strong></span>
             </label>
@@ -331,11 +333,13 @@
             <div class="modal-body" style="padding:16px;background:var(--bg3)">
 
               <!-- Opsi Tambahan Statistik -->
-              <div style="display:flex;align-items:center;justify-content:space-between;background:rgba(200,160,32,0.12);padding:10px 16px;border-radius:6px;margin-bottom:14px;border:1px solid rgba(200,160,32,0.35);font-size:12.5px;flex-wrap:wrap;gap:8px">
+              <div
+                style="display:flex;align-items:center;justify-content:space-between;background:rgba(200,160,32,0.12);padding:10px 16px;border-radius:6px;margin-bottom:14px;border:1px solid rgba(200,160,32,0.35);font-size:12.5px;flex-wrap:wrap;gap:8px">
                 <span style="color:var(--gold2);font-weight:600;display:flex;align-items:center;gap:6px">
                   <span>⚙️</span> Opsi Format Dokumen:
                 </span>
-                <label style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);user-select:none">
+                <label
+                  style="display:flex;align-items:center;gap:8px;cursor:pointer;color:var(--text);user-select:none">
                   <input type="checkbox" x-model="includeStats" style="accent-color:var(--gold);width:16px;height:16px">
                   <span>📊 <strong>Tampilkan &amp; Unduh Bagian Statistik Pelayanan Wilayah</strong></span>
                 </label>
@@ -346,7 +350,11 @@
 
                 <!-- Kop Surat Resmi -->
                 <div class="paper-kop print-kop">
-                  <div class="paper-kop-logo print-kop-logo" style="display:flex;align-items:center;justify-content:center;"><img src="../assets/img/logo.png" alt="Logo Sinode KINGMI Papua" style="width:75px;height:75px;object-fit:contain;"></div>
+                  <div class="paper-kop-logo print-kop-logo"
+                    style="display:flex;align-items:center;justify-content:center;"><img src="../assets/img/logo.png"
+                      alt="Logo Sinode KINGMI Papua" style="width:75px;height:75px;object-fit:contain;"
+                      onerror="this.onerror=null; if(typeof SIMGK_LOGO_BASE64!=='undefined'&&SIMGK_LOGO_BASE64){this.src=SIMGK_LOGO_BASE64;}">
+                  </div>
                   <div class="paper-kop-text print-kop-text">
                     <div class="paper-kop-title print-kop-title">SINODE GEREJA KEMAH INJIL (KINGMI) DI TANAH PAPUA</div>
                     <div class="paper-kop-sub print-kop-sub">BADAN PEKERJA KOORDINATOR PELAYANAN GEREJA · PAPUA TENGAH
@@ -398,9 +406,10 @@
 
                 <!-- Bagian 2: Ringkasan Statistik & Visual Grafik (Dinamis Sesuai Pilihan) -->
                 <div x-show="includeStats" style="margin-top:20px;border-top:1.5px solid #d1d5db;padding-top:14px">
-                  
+
                   <!-- Judul Bagian Statistik -->
-                  <div style="font-family:'Playfair Display',serif;font-size:13px;font-weight:800;color:#111827;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
+                  <div
+                    style="font-family:'Playfair Display',serif;font-size:13px;font-weight:800;color:#111827;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
                     <span>📊</span> Ringkasan Statistik Pelayanan Wilayah
                   </div>
 
@@ -425,7 +434,8 @@
                   </table>
 
                   <!-- Visual Grafik Distribusi Pelayanan per Kelasis -->
-                  <div style="font-family:'Playfair Display',serif;font-size:12.5px;font-weight:800;color:#111827;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
+                  <div
+                    style="font-family:'Playfair Display',serif;font-size:12.5px;font-weight:800;color:#111827;margin-bottom:8px;text-transform:uppercase;display:flex;align-items:center;gap:6px">
                     <span>📈</span> Grafik Visual Distribusi Jemaat &amp; Gereja per Kelasis
                   </div>
                   <table class="paper-table data-table">
@@ -441,21 +451,25 @@
                         <tr>
                           <td style="font-weight:700" x-text="cRow.nama"></td>
                           <td>
-                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#854d0e;margin-bottom:2px">
+                            <div
+                              style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#854d0e;margin-bottom:2px">
                               <span x-text="cRow.jemaat.toLocaleString('id') + ' Jiwa'"></span>
                               <span x-text="cRow.jPct + '%'"></span>
                             </div>
                             <div style="background:#e5e7eb;height:8px;border-radius:4px;overflow:hidden">
-                              <div style="background:#c8a020;height:100%;border-radius:4px" :style="'width:' + cRow.jPct + '%'"></div>
+                              <div style="background:#c8a020;height:100%;border-radius:4px"
+                                :style="'width:' + cRow.jPct + '%'"></div>
                             </div>
                           </td>
                           <td>
-                            <div style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#1e40af;margin-bottom:2px">
+                            <div
+                              style="display:flex;justify-content:space-between;font-size:10px;font-weight:600;color:#1e40af;margin-bottom:2px">
                               <span x-text="cRow.gereja + ' Gereja (' + cRow.pendeta + ' Pendeta)'"></span>
                               <span x-text="cRow.gPct + '%'"></span>
                             </div>
                             <div style="background:#e5e7eb;height:8px;border-radius:4px;overflow:hidden">
-                              <div style="background:#3b82f6;height:100%;border-radius:4px" :style="'width:' + cRow.gPct + '%'"></div>
+                              <div style="background:#3b82f6;height:100%;border-radius:4px"
+                                :style="'width:' + cRow.gPct + '%'"></div>
                             </div>
                           </td>
                         </tr>
