@@ -269,8 +269,28 @@ ${meta.statsRows && meta.statsRows.length ? `
   async printHTML(htmlContent) {
     await waitForLogoData();
     const inPages = window.location.pathname.includes('/pages/');
-    const baseHref = inPages ? '../' : './';
+    /* PENTING: base href harus URL HALAMAN SAAT INI apa adanya
+       (bukan '../' buatan sendiri). Kalau dipaksa '../', maka path
+       relatif apa pun yang masih ada di dalam htmlContent (mis.
+       "../assets/img/logo.png") akan ikut naik SEKALI LAGI dari
+       base yang sudah naik duluan -> "loncat ganda" dan keluar dari
+       folder proyek (mis. dari /SI-MOGE/pages/ jadi mendarat di
+       root domain, bukan /SI-MOGE/). Dengan base = URL halaman asli,
+       resolusi path relatif di iframe sama persis seperti di halaman
+       aslinya. */
+    const baseHref = window.location.href;
     const logoSrc = (typeof SIMGK_LOGO_BASE64 !== 'undefined' && SIMGK_LOGO_BASE64) ? SIMGK_LOGO_BASE64 : (inPages ? '../assets/img/logo.png' : 'assets/img/logo.png');
+
+    /* Sanitasi: htmlContent bisa datang dari innerHTML elemen preview
+       di halaman (mis. rep.innerHTML) yang mungkin masih memuat
+       <img src="assets/img/logo.png"> atau "../assets/img/logo.png"
+       apa adanya. Ganti semua kemunculan itu dengan logoSrc (base64
+       jika tersedia) supaya tidak lagi memicu request ke file yang
+       tidak ada. */
+    if (typeof htmlContent === 'string') {
+      htmlContent = htmlContent
+        .replace(/src=(["'])(?:\.\.\/)?assets\/img\/logo\.png\1/g, `src=$1${logoSrc}$1`);
+    }
 
     const iframe = document.createElement('iframe');
     iframe.style.position = 'fixed';
@@ -282,9 +302,7 @@ ${meta.statsRows && meta.statsRows.length ? `
     iframe.style.visibility = 'hidden';
     document.body.appendChild(iframe);
 
-    const doc = iframe.contentWindow.document;
-    doc.open();
-    doc.write(`<!DOCTYPE html>
+    const printDoc = `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8">
@@ -316,8 +334,7 @@ ${meta.statsRows && meta.statsRows.length ? `
 <body>
   ${htmlContent}
 </body>
-</html>`);
-    doc.close();
+</html>`;
 
     const triggerPrint = () => {
       try {
@@ -328,16 +345,36 @@ ${meta.statsRows && meta.statsRows.length ? `
       }
     };
 
-    iframe.contentWindow.onafterprint = () => {
-      try { iframe.remove(); } catch (e) { }
+    iframe.onload = () => {
+      try {
+        iframe.contentWindow.onafterprint = () => {
+          try { iframe.remove(); } catch (e) { }
+        };
+      } catch (e) { }
+
+      /* CATATAN KONSISTENSI:
+         window.print() bersifat blocking — skrip baru lanjut setelah
+         dialog cetak/print-preview ditutup oleh user (bisa berdetik-detik).
+         Sebelumnya panggilan ini dijadwalkan lewat requestAnimationFrame,
+         sehingga Chrome mencatatnya sebagai "requestAnimationFrame handler
+         took Xms" — padahal rAF semestinya untuk pekerjaan render cepat
+         (<16ms), bukan menunggu interaksi user. Dijadwalkan lewat
+         setTimeout supaya semantiknya benar: ini "tugas nanti", bukan
+         "tugas frame render berikutnya". Durasi warning itu sendiri
+         sebetulnya wajar/tidak berbahaya karena hanya mengukur lama user
+         berinteraksi dengan dialog print, bukan JS yang benar-benar berat. */
+      setTimeout(() => {
+        triggerPrint();
+        setTimeout(() => {
+          try { if (iframe.parentNode) iframe.remove(); } catch (e) { }
+        }, 3000);
+      }, 60);
     };
 
-    requestAnimationFrame(() => {
-      triggerPrint();
-      setTimeout(() => {
-        try { if (iframe.parentNode) iframe.remove(); } catch (e) { }
-      }, 3000);
-    });
+    /* srcdoc menggantikan document.write() (deprecated / dilarang
+       oleh Chrome untuk iframe non-blocking) sekaligus tetap
+       memicu event 'load' yang bisa dipakai untuk menjalankan print. */
+    iframe.srcdoc = printDoc;
   },
 
   async printReport(title, headers, rows, meta = {}) {
